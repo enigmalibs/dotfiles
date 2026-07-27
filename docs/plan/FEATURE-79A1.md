@@ -1,6 +1,6 @@
 # FEATURE-79A1 — Solution-bootstrap skills: EC-derived templates & bootstrap checklist
 
-**Status:** TODO
+**Status:** IN PROGRESS
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-79a1-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -72,7 +72,7 @@ line is traceable rather than arbitrary:
 
 ## PHASE01 — `dotnet-solution-setup`: bundled templates + bootstrap checklist
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** four new bundled templates plus the ordered bootstrap checklist, so a new solution's project
 files and root license come from a template instead of being retyped.
