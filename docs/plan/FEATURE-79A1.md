@@ -1,6 +1,6 @@
 # FEATURE-79A1 — Solution-bootstrap skills: EC-derived templates & bootstrap checklist
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-79a1-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -72,7 +72,7 @@ line is traceable rather than arbitrary:
 
 ## PHASE01 — `dotnet-solution-setup`: bundled templates + bootstrap checklist
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** four new bundled templates plus the ordered bootstrap checklist, so a new solution's project
 files and root license come from a template instead of being retyped.
@@ -187,7 +187,7 @@ invent.
 
 ## PHASE02 — `dotnet-solution-config` + `git-repo-hygiene` fixes
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** correct the three template defects and bring the CPM skeleton in line with what EC actually
 ships.
@@ -253,7 +253,7 @@ Add `*.bin binary` as the **first** entry of the forced-binary list, immediately
 
 ## PHASE03 — `xunit-v3` alignment
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** make `xunit-v3` agree with EC and with the two templates the earlier phases produce, so all
 three sources describe the same test project.

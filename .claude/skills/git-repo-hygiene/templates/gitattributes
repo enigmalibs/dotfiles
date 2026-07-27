@@ -17,6 +17,7 @@
 *.cmd   text eol=crlf
 
 # Belt-and-suspenders: force known binaries so git never converts them.
+*.bin binary
 *.png binary
 *.jpg binary
 *.gif binary

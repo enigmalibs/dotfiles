@@ -1,9 +1,33 @@
 ---
 name: dotnet-solution-setup
-description: Use when creating a new .NET solution or project, adding a project to a solution, writing or editing csproj files, choosing target frameworks, or wiring application startup and hosting.
+description: Use when creating a new .NET solution or project, adding a project to a solution, writing or editing csproj files, choosing target frameworks, or wiring application startup and hosting. Carries the ordered new-solution bootstrap checklist (which root file each skill owns, in creation order) and bundled .slnx / library .csproj / test .csproj / LICENSE.md templates.
 ---
 
 # .NET solution & project setup
+
+**Version: dotnet-solution-setup v2.**
+
+## New solution bootstrap — the ordered checklist
+
+Bootstrapping a solution spans three skills. This is the entry point: the full set of root artifacts, in creation order, each with the skill that owns it. Work top to bottom.
+
+| Order | Artifact | Owner |
+|---|---|---|
+| 1 | `git init -b <branch>` (or an existing repo) | user / dev-workflow |
+| 2 | `.gitignore`, `.gitattributes` | git-repo-hygiene |
+| 3 | `.editorconfig` — the **full C#** one, not git-repo-hygiene's minimal line-endings file | dotnet-solution-config |
+| 4 | `Directory.Build.props`, `Directory.Packages.props` | dotnet-solution-config |
+| 5 | `global.json` — SDK pin **and** the MTP `test.runner` entry | dotnet-solution-config |
+| 6 | `LICENSE.md` | **this skill** — `templates/LICENSE.md` |
+| 7 | `README.md`, `RELEASENOTES.md` — created **empty** | created here, filled by dotnet-release |
+| 8 | `<Solution>.slnx` | **this skill** — `templates/Solution.slnx` |
+| 9 | `src/<Project>/<Project>.csproj` | **this skill** — `templates/library.csproj` |
+| 10 | `tests/<Project>.UnitTests/<Project>.UnitTests.csproj` + one smoke test | **this skill** — `templates/test.csproj` / xunit-v3 |
+| 11 | `docs/roadmap.md`, `docs/plan/`, `docs/done/` | dev-workflow |
+
+`README.md` and `RELEASENOTES.md` exist from the first commit as **0-byte placeholders** — so the release phase has something to fill rather than something to invent.
+
+**Appears later, not at bootstrap:** `docs/guides/` and `msiProfiles/` are created by dotnet-release, and the library's NuGet packaging metadata (`PackageId`, `Version`, `Description`, `PackageReadmeFile`/`PackageLicenseFile` and their packing `ItemGroup`, …) is added to the csproj at release time — which is why `templates/library.csproj` ships without it.
 
 ## Solution layout
 
@@ -81,5 +105,18 @@ Don't silently default these — ask or state the choice explicitly: deployment 
 | Library scaffolded as `net10.0` "because it's newest" | `netstandard2.0` unless a documented reason requires more |
 | `<ImplicitUsings>enable</ImplicitUsings>` (template default) | Always `disable`, explicit usings per file |
 | Tests scaffolded with `dotnet new xunit` (v2) | xUnit v3 per the xunit-v3 skill |
+| Repeating `LangVersion` / `Nullable` / `ImplicitUsings` / `TreatWarningsAsErrors` in a `.csproj` | They live once in `Directory.Build.props` (dotnet-solution-config); a project csproj carries none of them |
+| `<PackageReference Include="System.Buffers" />` referenced unconditionally on a multi-targeted library | It is framework-provided on net8.0+ — an unconditional reference raises **NU1510** and fails the zero-warnings build. Guard it with `Condition="'$(TargetFramework)' == 'netstandard2.0'"` |
+
+## Bundled files
+
+Copy each to its target path and fill the placeholders. **Create only if missing** — if the target file already exists, do not overwrite it; show a diff against the template and let the user decide what to merge.
+
+- [`templates/Solution.slnx`](templates/Solution.slnx) — `.slnx` with `/src/` and `/tests/` solution folders (`{{PROJECT}}`).
+- [`templates/library.csproj`](templates/library.csproj) — multi-targeted library (`netstandard2.0;net8.0;net10.0`) with the conditional `System.Buffers` / `PolySharp` groups; no packaging metadata (release-time).
+- [`templates/test.csproj`](templates/test.csproj) — MTP-native xUnit v3 test project (`{{PROJECT}}`) with the fixture copy-glob.
+- [`templates/LICENSE.md`](templates/LICENSE.md) — MIT license text (`{{YEAR}}`, `{{AUTHORS}}`).
+
+Neither csproj template carries a `Version=` attribute on a `PackageReference` — versions come from `Directory.Packages.props` under Central Package Management (dotnet-solution-config).
 
 If an existing solution has its own layout or bootstrapping conventions, stay consistent with it and flag the divergence rather than silently mixing styles.

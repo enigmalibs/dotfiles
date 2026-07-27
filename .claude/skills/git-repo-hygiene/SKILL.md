@@ -5,6 +5,8 @@ description: Use when setting up or normalizing a .NET/Visual Studio git reposit
 
 # git-repo-hygiene
 
+**Version: git-repo-hygiene v2.**
+
 Give a .NET repo consistent, cross-platform text: LF-normalized files, correct binary handling, a Visual Studio ignore set, and shared editor defaults.
 
 ## When to use
@@ -20,7 +22,7 @@ Give a .NET repo consistent, cross-platform text: LF-normalized files, correct b
 | File | Purpose | Source |
 |------|---------|--------|
 | `.gitignore` | Ignore VS/dotnet build output, caches, and tool artifacts (plus Rider `.idea/`). | Frozen copy of GitHub's `VisualStudio.gitignore` — `templates/gitignore`. |
-| `.gitattributes` | Normalize all text to **LF** in the repo, keep `.bat`/`.cmd` as CRLF, force known binaries. | `templates/gitattributes`. |
+| `.gitattributes` | Normalize all text to **LF** in the repo, keep `.bat`/`.cmd` as CRLF, force known binaries (`*.bin` included — test fixtures and blobs must never be converted). | `templates/gitattributes`. |
 | `.editorconfig` | Editor defaults: LF, final newline, UTF-8 (CRLF for `.bat`/`.cmd`). | `templates/editorconfig`. |
 
 ## Workflow — create only if missing

@@ -1,6 +1,6 @@
 # FEATURE-6D97 — `dotnet-release`: EC-derived doc templates, first-release path & policy fixes
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-6d97-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -67,7 +67,7 @@ only — not a material revision.)
 
 ## PHASE01 — Bundled doc templates + `RELEASE.md` symbols fix
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the five missing document templates, plus the one-paragraph correction to `RELEASE.md`.
 
@@ -211,7 +211,7 @@ template stays as-is.
 
 ## PHASE02 — SKILL.md content rules: README, notes, guides, community files
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the prose rules that govern the PHASE01 templates — what must be true of the documents, not just
 what they look like.
@@ -299,7 +299,7 @@ against `src/`.
 
 ## PHASE03 — Packaging prerequisites, first-release path, pack-verify & release-item shapes
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the release mechanics — what a packable library must carry, what differs on a first release, and
 what the skill is allowed to run.
