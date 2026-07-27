@@ -21,3 +21,11 @@ The single, persistent registry of every work item in this project. Summary only
 | FEATURE-009 | dotnet-release TFM normalization   | DONE        | docs/plan/FEATURE-009.md |
 | FEATURE-010 | dotnet-release MSI profiles (apps) | DONE        | docs/plan/FEATURE-010.md |
 | FEATURE-0EF9 | Random-hex work-item IDs          | DONE        | docs/plan/FEATURE-0EF9.md |
+| FEATURE-79A1 | Bootstrap skills: EC templates    | TODO        | docs/plan/FEATURE-79A1.md |
+| - PHASE01   | setup templates + checklist        | TODO        | (in FEATURE-79A1.md)     |
+| - PHASE02   | config + hygiene fixes             | TODO        | (in FEATURE-79A1.md)     |
+| - PHASE03   | `xunit-v3` alignment               | TODO        | (in FEATURE-79A1.md)     |
+| FEATURE-6D97 | dotnet-release: EC doc templates  | TODO        | docs/plan/FEATURE-6D97.md |
+| - PHASE01   | doc templates + snupkg fix         | TODO        | (in FEATURE-6D97.md)     |
+| - PHASE02   | content rules (README/guides)      | TODO        | (in FEATURE-6D97.md)     |
+| - PHASE03   | release mechanics + item shapes    | TODO        | (in FEATURE-6D97.md)     |
