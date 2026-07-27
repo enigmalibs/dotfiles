@@ -1,6 +1,6 @@
 # FEATURE-6D97 — `dotnet-release`: EC-derived doc templates, first-release path & policy fixes
 
-**Status:** IN PROGRESS
+**Status:** DONE
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-6d97-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -299,7 +299,7 @@ against `src/`.
 
 ## PHASE03 — Packaging prerequisites, first-release path, pack-verify & release-item shapes
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the release mechanics — what a packable library must carry, what differs on a first release, and
 what the skill is allowed to run.

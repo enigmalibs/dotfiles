@@ -25,7 +25,7 @@ The single, persistent registry of every work item in this project. Summary only
 | - PHASE01   | setup templates + checklist        | DONE        | (in FEATURE-79A1.md)     |
 | - PHASE02   | config + hygiene fixes             | DONE        | (in FEATURE-79A1.md)     |
 | - PHASE03   | `xunit-v3` alignment               | DONE        | (in FEATURE-79A1.md)     |
-| FEATURE-6D97 | dotnet-release: EC doc templates  | IN PROGRESS | docs/plan/FEATURE-6D97.md |
+| FEATURE-6D97 | dotnet-release: EC doc templates  | DONE        | docs/plan/FEATURE-6D97.md |
 | - PHASE01   | doc templates + snupkg fix         | DONE        | (in FEATURE-6D97.md)     |
 | - PHASE02   | content rules (README/guides)      | DONE        | (in FEATURE-6D97.md)     |
-| - PHASE03   | release mechanics + item shapes    | TODO        | (in FEATURE-6D97.md)     |
+| - PHASE03   | release mechanics + item shapes    | DONE        | (in FEATURE-6D97.md)     |
