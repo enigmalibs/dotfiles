@@ -1,6 +1,6 @@
 # FEATURE-79A1 — Solution-bootstrap skills: EC-derived templates & bootstrap checklist
 
-**Status:** IN PROGRESS
+**Status:** DONE
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-79a1-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -253,7 +253,7 @@ Add `*.bin binary` as the **first** entry of the forced-binary list, immediately
 
 ## PHASE03 — `xunit-v3` alignment
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** make `xunit-v3` agree with EC and with the two templates the earlier phases produce, so all
 three sources describe the same test project.
