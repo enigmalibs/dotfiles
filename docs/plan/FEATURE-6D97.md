@@ -211,7 +211,7 @@ template stays as-is.
 
 ## PHASE02 — SKILL.md content rules: README, notes, guides, community files
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the prose rules that govern the PHASE01 templates — what must be true of the documents, not just
 what they look like.
