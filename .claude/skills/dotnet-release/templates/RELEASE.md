@@ -81,8 +81,10 @@ dotnet nuget push ./artifacts/{{PACKAGE_ID}}.X.Y.Z.nupkg \
   --source https://api.nuget.org/v3/index.json
 ```
 
-`dotnet pack` also emits a `.snupkg` symbols package alongside the `.nupkg`; pushing the `.nupkg` uploads the
-matching symbols automatically. The API key is a secret — never commit or echo it.
+`dotnet pack` produces **only** the `.nupkg` — that single file is what gets pushed. A `.snupkg` symbols
+package appears only when the library opts in to symbols (`IncludeSymbols` /
+`SymbolPackageFormat=snupkg`); if it does, pushing the `.nupkg` uploads the matching symbols
+automatically. The API key is a secret — never commit or echo it.
 
 ## 6. Post-publish verification
 

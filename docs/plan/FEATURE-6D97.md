@@ -1,6 +1,6 @@
 # FEATURE-6D97 — `dotnet-release`: EC-derived doc templates, first-release path & policy fixes
 
-**Status:** TODO
+**Status:** IN PROGRESS
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-6d97-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -67,7 +67,7 @@ only — not a material revision.)
 
 ## PHASE01 — Bundled doc templates + `RELEASE.md` symbols fix
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** the five missing document templates, plus the one-paragraph correction to `RELEASE.md`.
 
