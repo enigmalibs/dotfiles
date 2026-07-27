@@ -16,7 +16,7 @@ alias ls='eza -l --group-directories-first --icons'
 alias lsa='eza -la --group-directories-first --icons'
 alias cat='bat'
 alias ..='cd ..'
-alias claude="claude --model opus --settings '{\"ultracode\": true}'"
+# alias claude="claude --model opus --settings '{\"ultracode\": true}'"
 
 # alias ls='ls --color=auto'
 # alias grep='grep --color=auto'
