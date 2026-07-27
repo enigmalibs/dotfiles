@@ -187,7 +187,7 @@ invent.
 
 ## PHASE02 — `dotnet-solution-config` + `git-repo-hygiene` fixes
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** correct the three template defects and bring the CPM skeleton in line with what EC actually
 ships.
