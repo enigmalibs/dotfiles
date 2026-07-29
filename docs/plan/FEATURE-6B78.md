@@ -1,6 +1,6 @@
 # FEATURE-6B78 — Always offer a free-text escape option in questions
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (single-phase)
 **Branch:** `feature/feature-6b78-question-escape-hatch`
 
