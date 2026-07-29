@@ -15,7 +15,7 @@ This project plans work up front with `/interview` (which **only plans — it ne
 ## Phase 0: Announce the version
 **Before anything else**, your very first output must be exactly this line, as plain text, on its own line and with nothing before it:
 
-Using build v5 by Josué Clément
+Using build v6 by Josué Clément
 
 Then proceed.
 
@@ -43,7 +43,7 @@ Follow the `dev-workflow` skill's **build flow**:
 1. Create the dev's branch from your **current `HEAD`** (`feature/…` for a feature, `bugfix/…` for a bug, `review/…` for a code review, per the skill — never switch to the default branch; a detached `HEAD` is fine), then flip the item/phase status to `IN PROGRESS` as the first change on the branch.
 2. Implement to the plan's acceptance criteria, applying the house conventions — load any stack-specific convention skills the code calls for — and delegating cleanly separable parts to sub-agents per the skill.
 3. Meet the **Definition of Done**: the build is clean, the whole test suite passes (including the new tests the plan's acceptance criteria call for), every acceptance criterion is met, the roadmap + plan statuses are updated, and the dev's completion doc `docs/done/<ID>.md` is written (the skill's *Completion docs* / DoD criterion 5) — it lands in this dev's own commit. Never report an item `DONE` with a failing build or tests — report the failure instead.
-4. Run the skill's **documentation freshness sweep**: before printing the commit message, always ask (with concrete, analyzed candidates) whether to refresh any README / CLAUDE.md / other prose docs this dev may have made stale; fold any edits you accept into this dev's own commit. (Per the skill — build flow only; non-blocking.)
+4. Run the skill's **documentation freshness sweep**: before printing the commit message, always ask — with concrete, analyzed candidates, a skip option, and (per the skill's *Asking questions* rule) a final option letting me name a doc the sweep missed — whether to refresh any README / CLAUDE.md / other prose docs this dev may have made stale; fold any edits you accept into this dev's own commit. (Per the skill — build flow only; non-blocking.)
 5. Print the multi-phase progress table (if applicable) and the suggested commit message, then — per the skill — **pause and wait for me to commit** before starting the next dev.
 
 **Plan-mode note.** If the session is in plan mode, present the plan file's contents (the already-validated plan) as the implementation plan and obtain approval (ExitPlanMode) before any **state-changing** action (branch creation, status flips, file writes) — but run the read-only resolution steps first, since you can't present a plan until you know which one: reading `docs/roadmap.md`, printing the Phase 2 roadmap table and asking me for the ID (all read-only, allowed before `ExitPlanMode`), and reading + sanity-checking the plan (Phase 3). Do **not** re-run a fresh planning exercise — the item was already planned during the interview. In other permission modes, expect the first `git switch -c` and file writes to raise permission prompts; treat them as harness mechanics, not as a reason to change approach.

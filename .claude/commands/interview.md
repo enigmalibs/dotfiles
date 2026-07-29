@@ -18,7 +18,7 @@ Conduct a thorough requirements-gathering interview to extract all information n
 ## Phase 0: Announce the version
 **Before anything else** — before reading the draft, analysing, or asking any question — your very first output must be exactly this line, as plain text, on its own line and with nothing before it:
 
-Using interview v8 by Josué Clément
+Using interview v9 by Josué Clément
 
 Then proceed to Phase 1.
 
@@ -35,10 +35,10 @@ Then proceed to Phase 1.
 
 ### How to ask
 - **Ask every interview question through the AskUserQuestion tool** — never as free-text question lists. The tool takes at most 4 questions per call: run successive calls within a round rather than compressing questions, and let earlier answers shape later ones.
-- Give each question a short header and 2–4 concrete options; the tool adds an "Other" free-text choice automatically. Use multiSelect when the choices are not mutually exclusive.
-- **Always recommend.** Mark exactly one option — or the recommended subset, for multiSelect — with "(Recommended)" at the end of its label and list it first. Open its description with **why** you recommend it: trade-off reasoning grounded in my draft, the codebase, and the constraints gathered so far — never a generic platitude.
+- Give each question a short header and concrete options, and follow the `dev-workflow` skill's **Asking questions** rules — above all: **always leave me a free-text way out.** Assume the answer space is open and author a final **`None of these — I'll describe it`** option with a question-specific description, keeping to **at most 3 concrete options** so it fits the 4-option cap; omit it only for a provably closed set (a yes/no, or a genuine pick-one-of-N), where the tool's automatic "Other" choice suffices. Use multiSelect when the choices are not mutually exclusive.
+- **Always recommend.** Mark exactly one option — or the recommended subset, for multiSelect — with "(Recommended)" at the end of its label and list it first; the escape option is exempt — it is always last and never recommended. Open the recommended option's description with **why** you recommend it: trade-off reasoning grounded in my draft, the codebase, and the constraints gathered so far — never a generic platitude.
 - **Make every option self-explanatory to a non-expert.** Each option's description states what choosing it means in practice, gives a concrete example where that clarifies the choice (a usage scenario, a sample input/output, a file path, a 2–3-line code sketch), and names its main pro and con.
-- For genuinely open-ended questions where fixed options don't fit, still state a default: "If you have no preference, I'd go with X because …".
+- For genuinely open-ended questions where fixed options don't fit, still ask through the tool — offer 2–3 plausible sample answers plus the escape option — and still state a default: "If you have no preference, I'd go with X because …".
 - **One decision per question** — never merge several decisions into a compound question; group *related questions* into the same round instead.
 
 ### What to ask, in what order

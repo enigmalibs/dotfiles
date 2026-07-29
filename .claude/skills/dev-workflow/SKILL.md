@@ -5,7 +5,7 @@ description: Use when planning or implementing tracked work items under this hou
 
 # Dev workflow — house planning, tracking & version-control standards
 
-**Version: dev-workflow v3.**
+**Version: dev-workflow v4.**
 
 These standards govern *how* tracked development work is planned, recorded, and delivered. They are shared by `/interview` (which **only plans** work — it never builds) and `/build` (which executes a previously planned item). If the existing codebase already enforces its own conventions (documentation layout, branch naming, an existing roadmap or work-item ID scheme, etc.), those take precedence over the defaults here — confirm any such conventions before allocating IDs or creating branches.
 
@@ -17,6 +17,16 @@ This workflow separates *planning* from *building*, so plans can be produced now
 
 - **Planning flow** — produce the artifacts without implementing. Write the roadmap row(s) and plan file(s) with status `TODO` on your **current branch or `HEAD`** (see Version Control); create **no** dev branch. The plan file is the durable contract a later build consumes. `/interview` **always** runs this flow; it never implements.
 - **Build flow** — implement a dev. Create its branch from your **current `HEAD`** **first** (see Version Control), then implement. Any planning artifacts not already committed (roadmap row, plan file) are the first change on that branch — a freshly created row/plan is written directly at status `IN PROGRESS` (not `TODO`); if the plan file already exists (planned earlier), the first change on the branch is instead flipping that item/phase status to `IN PROGRESS`. `/build` always runs this flow against an already-planned item; `/interview` never runs it.
+
+## Asking questions (both flows)
+
+Whenever you need a decision from the user — in either flow, and whatever the command — ask it like this.
+
+- **Ask through `AskUserQuestion`**, never as a prose question list. This holds even when the answer is a free value (a name, a path, a number, a short description): offer 2–3 plausible sample values plus the escape option below, rather than asking in prose.
+- **Assume the answer space is open — always leave a free-text way out.** Author an explicit final option using the constant stem **`None of these — I'll describe it`**, with a *question-specific* description saying what to type (e.g. "Pick this if none of the three approaches above fits — type the pattern you want, or 'defer this decision'"). Omit it **only** when the options *provably* enumerate every possible answer — a yes/no, or a genuine pick-one-of-N such as `FEATURE` vs `BUG` vs `CODE-REVIEW` — where the tool's automatic "Other" choice is enough. Anything about approach, design, scope, naming, priorities, or preference is **open by default**: the burden of proof is on the claim that a set is closed, never on the escape option. (`AskUserQuestion`'s own guidance says not to author an "Other" option because the tool adds one; this house rule deliberately overrides that — the automatic choice is too easy to miss, which is exactly how the user ends up cornered into a wrong option.)
+- **Budget the 4-option cap:** an open question carries **at most 3 concrete options** plus the escape option. If you have more candidates than fit, group them or name the extras in the question text — never silently drop one.
+- **The escape option is always last, and never carries `(Recommended)`.** The recommendation stays a concrete, actionable default listed first; the escape option is the exit, not the advice.
+- **A typed answer is a decision.** Adopt it, restate your reading of it in one line, and continue — no confirmation round. In an interview, record it in the Phase 3 summary under *"Decisions you made"*.
 
 ## Planning & Documentation
 
@@ -111,7 +121,7 @@ Only after all five may you print the progress table (multi-phase items) and the
 **Build flow only** — the planning flow never runs this. Once a dev has met the Definition of Done (roadmap + plan statuses updated, `docs/done/<ID>.md` written) and **before** you print the progress table and the suggested commit message, run a documentation freshness sweep so user-facing docs don't silently fall out of date.
 
 - **Scan the dev's changes** and identify project/user-facing documentation the change may have made stale, across: **README** files; **CLAUDE.md** / agent-instruction files (`AGENTS.md`, etc.); and **other prose docs** (e.g. `CHANGELOG.md`, `CONTRIBUTING.md`, a docs site, other human-facing files under `docs/`). **Exclude the workflow's own tracked artifacts** — `docs/roadmap.md`, `docs/plan/`, `docs/done/` are already handled by the Definition of Done — and do not treat skill/command prompt files as sweep targets.
-- **Always ask, with concrete candidates.** Surface one `AskUserQuestion` every time (even when nothing looks stale). Offer the specific files/sections you recommend updating — one option each, with a one-line reason (e.g. "README 'Usage' still shows the old flag") — plus a **"none / skip"** option. If the sweep found nothing, say so and recommend skip. Never edit docs without asking.
+- **Always ask, with concrete candidates.** Surface one `AskUserQuestion` every time (even when nothing looks stale). Offer the specific files/sections you recommend updating — one option each, with a one-line reason (e.g. "README 'Usage' still shows the old flag") — plus a **"none / skip"** option and, per *Asking questions*, a final **`A different doc — I'll name it`** option so the user can point at something the sweep missed. With the 4-option cap that leaves room for two concrete candidates: if the sweep found more, group them into one option or name the extras in the question text rather than dropping any. If the sweep found nothing, say so and recommend skip. Never edit docs without asking.
 - **Accepted edits land in this dev's own commit.** If the user selects targets, make those edits now; they ride in the same commit as the code and the completion doc, and you extend the suggested commit message to mention them. If the user skips, proceed unchanged.
 - **Non-blocking.** This is a safety-net prompt, not a sixth Definition-of-Done criterion — never hold a dev's `DONE` status on it.
 
