@@ -29,3 +29,4 @@ The single, persistent registry of every work item in this project. Summary only
 | - PHASE01   | doc templates + snupkg fix         | DONE        | (in FEATURE-6D97.md)     |
 | - PHASE02   | content rules (README/guides)      | DONE        | (in FEATURE-6D97.md)     |
 | - PHASE03   | release mechanics + item shapes    | DONE        | (in FEATURE-6D97.md)     |
+| FEATURE-6B78 | Question free-text escape option | TODO        | docs/plan/FEATURE-6B78.md |
