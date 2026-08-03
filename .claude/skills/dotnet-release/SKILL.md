@@ -36,6 +36,7 @@ dotnet pack <lib.csproj> -c Release -o ./artifacts-verify   # then inspect, then
 Confirm, from the `.nupkg` and the nuspec it contains:
 
 - the **`.nupkg` version** matches the release `X.Y.Z`;
+- the verify directory holds **the `.nupkg` and nothing else** — no `.snupkg` (see *Symbols — never shipped*);
 - **`README.md` is embedded and non-empty** (an empty packed README is a silent nuget.org landing-page failure);
 - **`LICENSE.md` is embedded**;
 - the nuspec's **`<version>`, `<title>`, `<license type="file">`, `<readme>` and `<releaseNotes>`** are all correct;
@@ -192,21 +193,20 @@ Plus two structural requirements:
   </ItemGroup>
   ```
 - **`GeneratePackageOnBuild` OFF** (absent, or `false`) — a publishable library is packed explicitly by the release step, never on every local build, consistent with the print-don't-run boundary.
+- **No symbol properties** — `IncludeSymbols`, `SymbolPackageFormat`, `PublishRepositoryUrl`, and `EmbedUntrackedSources` must all be absent (see *Symbols — never shipped* below).
 
 **dotnet-solution-setup**'s [`templates/library.csproj`](../dotnet-solution-setup/templates/library.csproj) deliberately omits this whole block: the packaging metadata is added **here, at release time**, not at bootstrap. A library that has never been released will be missing all 12 — that is expected, not drift.
 
-### Symbols & SourceLink (opt-in)
+### Symbols — never shipped
 
-**No symbol package by default.** `dotnet pack` produces only the `.nupkg`, and that is what most libraries ship (Enigma.Core included). When symbols *are* wanted, opt in explicitly in the library csproj:
+**House rule: no symbol package.** A release ships exactly one file, the `.nupkg`. `dotnet pack` already behaves this way by default, so the rule is about *not* opting in:
 
-```xml
-<PublishRepositoryUrl>true</PublishRepositoryUrl>
-<IncludeSymbols>true</IncludeSymbols>
-<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-<EmbedUntrackedSources>true</EmbedUntrackedSources>
-```
+- **Never add** `IncludeSymbols`, `SymbolPackageFormat`, `PublishRepositoryUrl`, or `EmbedUntrackedSources` to a packable csproj, and never suggest them — not as an option, not as a "consider this" aside.
+- **Never pass** `--include-symbols` / `-p:IncludeSymbols=true` to `dotnet pack`, and never add a `dotnet nuget push` line for a `.snupkg`.
+- **If an existing csproj carries any of them**, that is drift: report it and remove the properties so the next pack emits only the `.nupkg`.
+- **Pack-verify asserts it** — the output dir must contain the `.nupkg` and nothing else. A `.snupkg` beside it means the opt-in leaked back in.
 
-Only then does a `.snupkg` appear beside the `.nupkg`, and pushing the `.nupkg` uploads the matching symbols automatically. What it buys: consumers get real stack traces into the library and can step into its source while debugging. When you enable it, **update `docs/RELEASE.md`** — the bundled template's step 5 wording assumes no symbols.
+`GenerateDocumentationFile` (property 12) stays on — the XML doc file ships *inside* the `.nupkg` and is unrelated to symbols.
 
 ## Runbook — print, never run
 
@@ -356,7 +356,7 @@ Every doc template follows the same handling rule as `RELEASE.md`: **create only
 | Shipping a guide whose snippets were never verified against `src/` | Run the snippet-verification gate and record the coverage table — there is no compile harness to catch drift. |
 | Publishing a package with no `Description` or `Title` | Both are required metadata; nuget.org renders the package badly without them. All 12 properties, every time. |
 | Packing but never inspecting the artifact | Pack-verify into a throwaway dir and check version, embedded non-empty README, LICENSE, the nuspec fields and dependency floors — then delete it. |
-| Claiming a `.snupkg` exists without `IncludeSymbols` | `dotnet pack` emits only the `.nupkg` by default; symbols are an explicit opt-in. |
+| Shipping or offering a symbol package — `IncludeSymbols` / `SymbolPackageFormat` / `--include-symbols`, or a `.snupkg` push line | House rule: releases ship the `.nupkg` only. Never opt in, never suggest it; strip the properties if an existing csproj has them. |
 | Running the license audit on test-only packages, or skipping it on runtime ones | Audit what ships: runtime dependencies. Compile-only (`PrivateAssets=all`) and test-only packages are not redistributed. |
 
 If the target repo already has its own release conventions (tag prefix, notes layout, badge set), stay consistent with them and flag the divergence rather than silently imposing these defaults.

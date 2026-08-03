@@ -67,7 +67,8 @@ explicitly in Release to get the artifact you publish:
 dotnet pack {{LIB_CSPROJ}} -c Release -o ./artifacts
 ```
 
-This writes `./artifacts/{{PACKAGE_ID}}.X.Y.Z.nupkg`. Confirm the version in the filename matches the tag, and
+This writes `./artifacts/{{PACKAGE_ID}}.X.Y.Z.nupkg` — and nothing else; a `.snupkg` beside it means the
+symbol opt-in crept back into the csproj. Confirm the version in the filename matches the tag, and
 (optionally) inspect the package contents — it should bundle `README.md` and `LICENSE.md` and declare the
 expected dependency floors.
 
@@ -81,10 +82,10 @@ dotnet nuget push ./artifacts/{{PACKAGE_ID}}.X.Y.Z.nupkg \
   --source https://api.nuget.org/v3/index.json
 ```
 
-`dotnet pack` produces **only** the `.nupkg` — that single file is what gets pushed. A `.snupkg` symbols
-package appears only when the library opts in to symbols (`IncludeSymbols` /
-`SymbolPackageFormat=snupkg`); if it does, pushing the `.nupkg` uploads the matching symbols
-automatically. The API key is a secret — never commit or echo it.
+`dotnet pack` produces **only** the `.nupkg` — that single file is what gets pushed. This project does not
+ship a `.snupkg` symbols package: the symbol opt-in properties (`IncludeSymbols`,
+`SymbolPackageFormat`) are deliberately absent from the csproj and must stay that way, and `pack` is never
+run with `--include-symbols`. The API key is a secret — never commit or echo it.
 
 ## 6. Post-publish verification
 
