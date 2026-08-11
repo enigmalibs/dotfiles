@@ -5,7 +5,7 @@ description: Use when planning or implementing tracked work items under this hou
 
 # Dev workflow — house planning, tracking & version-control standards
 
-**Version: dev-workflow v4.**
+**Version: dev-workflow v5.**
 
 These standards govern *how* tracked development work is planned, recorded, and delivered. They are shared by `/interview` (which **only plans** work — it never builds) and `/build` (which executes a previously planned item). If the existing codebase already enforces its own conventions (documentation layout, branch naming, an existing roadmap or work-item ID scheme, etc.), those take precedence over the defaults here — confirm any such conventions before allocating IDs or creating branches.
 
@@ -55,7 +55,13 @@ Every unit of work gets a stable ID before anything else happens:
 
 The roadmap holds **only** a summary table — never plan details. Columns: **ID · Title · Status · Plan** (the path to the item's plan file).
 
-- **Status vocabulary:** `TODO`, `IN PROGRESS`, `DONE`, `ABANDONED`.
+- **Table formatting — the table is read raw, so keep it aligned.** People read this table as plain text (in an editor, in `git diff`, in the console when `/build` prints it), not only rendered, so the columns must line up:
+  - **Uniform column widths.** Pad every cell in a column with trailing spaces to the width of the **widest cell in that column, header included**, and give the delimiter row's dashes that same width. Keep the conventional single space after the opening `|` and before the closing `|`, so every `|` sits at the same offset on every line of the table.
+  - **Width is content-driven — never fixed, never truncating.** IDs, statuses, and plan paths are always written in full; the column simply grows to the widest one. Count **characters**, not bytes, so a title containing `—` or `` ` `` still aligns.
+  - **Keep the Title cell short** — a summary line, roughly ≤ 40 characters. Title is the one column that can grow without bound, and one verbose title pads every other row; abbreviate it and let the plan file carry the full statement of the work.
+  - **Phase rows align like any other row:** the `- PHASENN` marker sits in the ID column, padded to the same width as the base IDs.
+- **Reformat the whole table on every edit.** Whenever you touch the table for **any** reason — appending an item, adding a phase row, flipping a status, abandoning an item, fixing a title — **rewrite every row** so all columns are re-padded to the current widest cell. This is part of the same edit, never a follow-up chore: one new row whose ID or path is a single character wider than the current column invalidates the padding of *every* other row, which is exactly how a table drifts out of alignment. Never leave it ragged "because only one row changed". The same padding applies to the phase progress table you print to the console (see *Multi-phase progress reporting*).
+- **Status vocabulary:** `TODO`, `IN PROGRESS`, `DONE`, `ABANDONED` — the Status cell holds the bare keyword and nothing else (see *Abandoning or changing direction* for where an abandon reason goes).
 - **Ordering — the row order is the order.** Because IDs are random and carry no sequence, an item's position in the table *is* its order — **append each new item as the last row.** `/build` recommends the topmost `TODO`/`IN PROGRESS` item, so oldest-planned work is surfaced first.
 - For a multi-phase item, list the item on one row, then one indented `- PHASENN` row per phase, each carrying its own status; the phase rows reference the item's plan file as `(in FEATURE-3A7F.md)`.
 - **Keep it current — update the roadmap after every dev** so each item/phase status reflects reality. Add a new item's row when it is created: in the **planning flow** on your current branch/`HEAD`; in the **build flow** as the first change on the dev's branch (see Version Control).
@@ -96,10 +102,16 @@ The completion doc is part of the **dev's own commit** (it lands with the code, 
 
 ### Abandoning or changing direction
 
-If you decide to drop a dev, or to do it a different way, **do not delete its row.** Set its status to `ABANDONED` and, in the status cell, record a short reason and — if applicable — the ID of the item that replaces it. Mirror the same note at the top of the item's plan file.
+If you decide to drop a dev, or to do it a different way, **do not delete its row.** Set its status to the bare keyword `ABANDONED`, then record a short reason — and, if applicable, the ID of the item that replaces it — as a **blockquote footnote beneath the table**, keyed by the item's ID. Mirror the same note at the top of the item's plan file.
+
+The reason is kept out of the Status cell deliberately: a sentence-long cell would pad the Status column of the *whole* table to its width (see *Table formatting*), which costs every row's readability to annotate one.
 
 ```markdown
-| FEATURE-4B21 | Custom cache layer | ABANDONED — superseded by a simpler approach; replaced by FEATURE-8D0C | docs/plan/FEATURE-4B21.md |
+| ID           | Title              | Status    | Plan                      |
+|--------------|--------------------|-----------|---------------------------|
+| FEATURE-4B21 | Custom cache layer | ABANDONED | docs/plan/FEATURE-4B21.md |
+
+> `FEATURE-4B21` abandoned — superseded by a simpler approach; replaced by `FEATURE-8D0C`.
 ```
 
 ## Definition of Done
