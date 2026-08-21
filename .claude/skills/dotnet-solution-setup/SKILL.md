@@ -34,7 +34,7 @@ Bootstrapping a solution spans three skills. This is the entry point: the full s
 - Solution format: **`.slnx`** (XML), not legacy `.sln`. The .NET 10 SDK's `dotnet new sln` emits `.slnx` by default; migrate existing files with `dotnet sln <file.sln> migrate` (keep only one of `.sln`/`.slnx` per directory).
 - Three top-level directories at the solution root:
   - `src/` — production projects
-  - `tests/` — test projects (xUnit v3 — see xunit-v3)
+  - `tests/` — test projects (xUnit v3, package `xunit.v3` 4.x — see xunit-v3)
   - `docs/` — markdown documentation
 
 ## Target frameworks
@@ -104,7 +104,7 @@ Don't silently default these — ask or state the choice explicitly: deployment 
 | `Host.CreateDefaultBuilder(args).ConfigureServices(...)` | `Host.CreateApplicationBuilder(args)` + `builder.Services` |
 | Library scaffolded as `net10.0` "because it's newest" | `netstandard2.0` unless a documented reason requires more |
 | `<ImplicitUsings>enable</ImplicitUsings>` (template default) | Always `disable`, explicit usings per file |
-| Tests scaffolded with `dotnet new xunit` (v2) | xUnit v3 per the xunit-v3 skill |
+| Tests scaffolded with `dotnet new xunit` (v2) | xUnit v3 (`xunit.v3` 4.x) per the xunit-v3 skill |
 | Repeating `LangVersion` / `Nullable` / `ImplicitUsings` / `TreatWarningsAsErrors` in a `.csproj` | They live once in `Directory.Build.props` (dotnet-solution-config); a project csproj carries none of them |
 | `<PackageReference Include="System.Buffers" />` referenced unconditionally on a multi-targeted library | It is framework-provided on net8.0+ — an unconditional reference raises **NU1510** and fails the zero-warnings build. Guard it with `Condition="'$(TargetFramework)' == 'netstandard2.0'"` |
 

@@ -5,9 +5,11 @@ description: Use when setting up or writing .NET tests — creating a test proje
 
 # xUnit v3 — house testing conventions
 
-**Version: xunit-v3 v2.**
+**Version: xunit-v3 v3.**
 
-House rule: new test projects use **xUnit v3** (`xunit.v3` package) — not `xunit` 2.x, not MSTest/NUnit (deviating needs a documented compatibility reason). Test projects live under `tests/`, are named **`<ProjectUnderTest>.UnitTests`**, and mirror the TFMs of the project under test (see *Target frameworks* below).
+House rule: new test projects use **xUnit v3 at version 4.x** (`xunit.v3` package) — not `xunit` 2.x, not MSTest/NUnit (deviating needs a documented compatibility reason). Test projects live under `tests/`, are named **`<ProjectUnderTest>.UnitTests`**, and mirror the TFMs of the project under test (see *Target frameworks* below).
+
+**On the numbering:** the package is `xunit.v3` and stays that way — "v3" is the *core-framework generation*, `4.0.0` is its *version*; upstream titles the release "Core Framework v3 4.0.0". A `4.x` version on a `v3` package is expected, not a mismatch.
 
 ## Naming
 
@@ -19,12 +21,15 @@ A test project **mirrors the TFMs of the library under test**. A multi-targeted 
 
 `netstandard2.0` is never itself a *test* TFM — it is not a runtime. `net8.0` is the TFM that exercises the polyfilled surface.
 
+**4.0's floor is `net8.0`** (or `net472` on .NET Framework). A library still multi-targeting `net6.0`/`net7.0` cannot have those TFMs mirrored in a 4.x test project — the restore falls back to the .NET Framework assets and emits `NU1701`, which the house `TreatWarningsAsErrors` turns into a build failure. This does not move the house pair, which is already `net8.0;net10.0`.
+
 ## Project setup (MTP-native — the default)
 
 xUnit v3 test projects are **standalone executables** on Microsoft.Testing.Platform.
 
+- **4.0 defaults to MTP v2**, and **MTP v1 support is removed** from 4.0 onward. Plain `xunit.v3` is the house choice and pulls MTP v2 in transitively; the variants are `xunit.v3.mtp-v2` (pin v2 explicitly) and `xunit.v3.mtp-off` (no MTP at all). `xunit.v3.mtp-v1` is 3.x-only — it has no 4.x release.
 - **Forbidden — VSTest-era boilerplate that actively breaks MTP:** `Microsoft.NET.Test.Sdk` and `xunit.runner.visualstudio`. Never add either to a v3 project.
-- **Sanctioned opt-in — coverage:** `coverlet.collector` with `PrivateAssets="all"`, when coverage is wanted. It works fine under MTP; it was only ever guilty by association — `Microsoft.NET.Test.Sdk` is the package that conflicts. The house CPM skeleton lists it in its Tests group (see dotnet-solution-config).
+- **Sanctioned opt-in — coverage:** `Microsoft.Testing.Extensions.CodeCoverage`, when coverage is wanted. **Not `coverlet.collector`** — that is a *VSTest data collector*, and MTP v2 does not host VSTest data collectors, so it silently collects nothing. This is not guilt by association: it genuinely does not work. (`coverlet.MTP` exists as the coverlet-ecosystem alternative for MTP ≥ 2.0.0; it is not the house choice.)
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -38,7 +43,7 @@ xUnit v3 test projects are **standalone executables** on Microsoft.Testing.Platf
   <ItemGroup>
     <PackageReference Include="xunit.v3" />
     <!-- Optional, for coverage: -->
-    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/MyLib/MyLib.csproj" />
@@ -46,11 +51,16 @@ xUnit v3 test projects are **standalone executables** on Microsoft.Testing.Platf
 </Project>
 ```
 
-- **No `Version` attributes** — under Central Package Management (dotnet-solution-config) the versions live once in `Directory.Packages.props` as `<PackageVersion Include="xunit.v3" Version="3.2.2" />`. **Without** CPM, and only then, the version goes inline: `<PackageReference Include="xunit.v3" Version="3.2.2" />`.
+- **No `Version` attributes** — under Central Package Management (dotnet-solution-config) the versions live once in `Directory.Packages.props` as `<PackageVersion Include="xunit.v3" Version="4.0.0" />`. **Without** CPM, and only then, the version goes inline: `<PackageReference Include="xunit.v3" Version="4.0.0" />`.
 - **No `LangVersion` / `Nullable` / `ImplicitUsings` / `TreatWarningsAsErrors`** — they come from the solution-root `Directory.Build.props` (dotnet-solution-config) and must never be repeated per-project.
+- **No coverage properties.** `Microsoft.Testing.Extensions.CodeCoverage` needs **no** csproj property to work on the .NET 10 SDK with the `global.json` runner entry below — not `UseMicrosoftTestingPlatformRunner`, not `TestingPlatformDotnetTestSupport`. Upstream's coverage page predates SDK 10 and prescribes both; on SDK 10 neither is needed, and `TestingPlatformDotnetTestSupport` is wrong here (see below).
 - The full bundled version of this file, with the fixture copy-glob `ItemGroup`, is `dotnet-solution-setup/templates/test.csproj`.
 
-Version note: 3.2.2 is stable as of 2026-07 — use the latest stable **3.x**; xUnit 4.x is prerelease, don't use it.
+Version note: 4.0.0 is stable as of 2026-08 — use the latest stable **4.x**.
+
+**Toolchain floor:** 4.0 ships Analyzers 2.0.0, which needs Roslyn 4.11+ → **SDK 8.0.400+ / VS 2022 17.11+**. Under the house `TreatWarningsAsErrors`, the analyzers' new diagnostics *fail the build* rather than warn — expect to triage them on first upgrade.
+
+**Mono:** official support was discontinued in 4.0.
 
 On the .NET 10 SDK, switch `dotnet test` to MTP mode once per repo in **global.json**:
 
@@ -62,9 +72,48 @@ That entry sits alongside the SDK pin in the same file — dotnet-solution-confi
 
 Do not emit a `dotnet.config` (removed preview mechanism); `TestingPlatformDotnetTestSupport` is only for .NET 8/9 SDKs.
 
-Run with `dotnet test` using MTP filters (`--filter-class`, `--filter-method`, `--filter-trait`, `--filter-query` — not VSTest's `--filter FullyQualifiedName~…`), or run the built exe directly.
+**Coverage run:**
 
-**Passing a solution:** on the .NET 10 SDK in MTP mode, `dotnet test <Solution>.slnx` is rejected — use `dotnet test --solution <Solution>.slnx`. Plain `dotnet test` inside a project directory still works.
+```
+dotnet test -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+```
+
+`--coverage-output` names the file, not the path — the report lands in the project's `TestResults/` directory.
+
+## Running tests
+
+Run with `dotnet test` using MTP filters — not VSTest's `--filter FullyQualifiedName~…`. Under MTP v2 the available filters are `--filter-class`, `--filter-method`, `--filter-trait`, `--filter-query`, and **new in 4.0** `--filter-display-name` / `--filter-not-display-name`, which match on the test *display* name and so can target an individual theory data row. Each has a `--filter-not-*` negation. Or run the built exe directly — but note the exe exposes xUnit's **native** console syntax (`-class`, `-method`, `-trait`, `-filter`, `-result-*`), not the MTP `--`-prefixed switches; the two command lines are separate surfaces.
+
+A filter that matches nothing is not silent: the run ends "Zero tests ran" with a non-success exit code.
+
+**Passing a solution:** `dotnet test --solution <Solution>.slnx` is the explicit, always-correct form — use it in scripts, docs, and CI. On the .NET 10 SDK the bare positional `dotnet test <Solution>.slnx` is *also* accepted (it was rejected on earlier 10.0 SDKs), so treat `--solution` as the portable form rather than the only working one. Plain `dotnet test` inside a project directory still works.
+
+## Test parallelization
+
+**The house default is `collections`, and 4.0 does not change it** — one test collection per class, so different classes run concurrently while tests inside a class run sequentially. Do not change this per project without a reason.
+
+**`all` is 4.0's headline opt-in** — every test may run against every other, regardless of collection or shared context. The cost is plain: any mutable instance field, static, or shared fixture state becomes a flake source. Opt in at assembly level:
+
+```csharp
+using Xunit.Sdk;   // ParallelMode, ParallelAlgorithm
+using Xunit.v3;    // Parallelization
+
+[assembly: Parallelization(Mode = ParallelMode.All, MaxThreads = 4, Algorithm = ParallelAlgorithm.Conservative)]
+```
+
+Mind the namespaces — `ParallelizationAttribute` is in **`Xunit.v3`** and the two enums are in **`Xunit.Sdk`**; a lone `using Xunit;` does not compile. `ParallelMode` is `None` / `Collections` / `All`; `ParallelAlgorithm` is `Conservative` / `Aggressive`. This attribute **supersedes** `[assembly: CollectionBehavior(…)]`, which still compiles at 4.0 (it is not obsoleted) but cannot express `Mode = All` — prefer `Parallelization` in new code.
+
+Opt out at any level. **The property is `DisableParallelization` everywhere — there is no `DisableParallelism`:**
+
+| Level | Opt-out |
+|---|---|
+| Collection | `[CollectionDefinition("Name", DisableParallelization = true)]` |
+| Class | `[TestClass(DisableParallelization = true)]` |
+| Method | `[Fact(DisableParallelization = true)]` / `[Theory(DisableParallelization = true)]` |
+| Data source | `[InlineData(1, DisableParallelization = true)]` |
+| Data row | `new TheoryDataRow<int>(1) { DisableParallelization = true }` |
+
+The equivalent `xunit.runner.json` key is `parallelMode` (`none` / `collections` / `all`).
 
 ## Writing tests — v3 API notes
 
@@ -93,15 +142,49 @@ public sealed class CalculatorTests
 - No `async void` tests (they fast-fail at runtime) — return `Task`/`ValueTask`.
 - `xunit.runner.json` still works: `<Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />`.
 
-## Common stale v2-isms
+New in 4.0:
 
-| Wrong (v2 habit) | Right (v3) |
-|---|---|
-| `<PackageReference Include="xunit" Version="2.x" />` | `xunit.v3` |
-| `Microsoft.NET.Test.Sdk` + `xunit.runner.visualstudio` (VSTest boilerplate) | just `xunit.v3` + the global.json test runner entry (`coverlet.collector` stays, if coverage is wanted) |
-| Missing `<OutputType>Exe</OutputType>` or a hand-written `Program.Main` | Exe output; `Main` is generated |
-| `using Xunit.Abstractions;` | `using Xunit;` |
-| `Task IAsyncLifetime.InitializeAsync()` | `ValueTask` |
+- `Assert.All(collection, action, throwIfEmpty: true)` fails on an empty collection instead of passing vacuously. (The parameter is `throwIfEmpty`, not `strict`.)
+- `Assert.OverrideMaxEnumerableLength(…)` / `OverrideMaxObjectDepth(…)` / `OverrideMaxObjectMemberCount(…)` / `OverrideMaxStringLength(…)` tune assertion-failure message formatting per test.
+- Generic attribute variants on net8+: `TestCaseOrdererAttribute<TOrderer>`, `AssemblyFixtureAttribute<TFixture>`, and the orderer attributes below — no more `typeof(…)` arguments.
+- Orderers now exist at **class** and **method** level too (`TestClassOrdererAttribute<T>`, `TestMethodOrdererAttribute<T>`), alongside collection and test-case orderers. Execution order is resolved collection → class → method → case.
+- `methodDisplayOptions` gains `removeAsyncSuffix` (`TestMethodDisplayOptions.RemoveAsyncSuffix`), which strips a trailing `Async` from displayed test names.
+
+## Native AOT — not the house default
+
+`xunit.v3.aot` / `xunit.v3.core.aot` replace the reflection-based packages for a native-AOT test binary. **Disqualifiers for house projects:** net9.0+ only (the house pair is `net8.0;net10.0`), C# only, no generic test methods, no serialization, no interface-based attributes, and significantly truncated stack traces. Reach for it only with a specific reason, and expect to give up generic theories.
+
+## Runner & CI changes in 4.0
+
+- **Report switches renamed** (MTP mode): `--report-ctrf` → `--report-xunit-ctrf`, `--report-junit` → `--report-xunit-junit`, `--report-nunit` → `--report-xunit-nunit`, `--report-xunit` → `--report-xunit-xml`. These **fail loudly** — an old name is rejected and the run exits non-zero having executed nothing.
+- **Report file extensions changed:** `.junit` → **`.junit.xml`**, `.nunit` → `.nunit.xml`, `.xunit` → `.xunit.xml` (CTRF stays `.ctrf`). These **fail silently** — a CI artifact glob on an old extension matches nothing while the build stays green. This is the dangerous one: fix the globs at the same time as the switches.
+
+## Migrating a 3.x project to 4.0
+
+1. Bump `xunit.v3` to `4.0.0`; confirm the toolchain is SDK 8.0.400+ / VS 2022 17.11+ (Analyzers 2.0.0 needs Roslyn 4.11+).
+2. Confirm every test TFM is `net8.0`+ (or `net472`).
+3. Replace `coverlet.collector` with `Microsoft.Testing.Extensions.CodeCoverage`; update the coverage invocation (`--collect:"XPlat Code Coverage"` / `/p:CollectCoverage` no longer apply — use `dotnet test -- --coverage …`).
+4. Rename `[assembly: CollectionBehavior(…)]` → `[assembly: Parallelization(…)]`: `DisableTestParallelization = true` → `Mode = ParallelMode.None`, `MaxParallelThreads` → `MaxThreads`. Add `using Xunit.v3;` and `using Xunit.Sdk;`.
+5. Update CI report switch names **and** artifact globs (`.junit.xml`, `.nunit.xml`, `.xunit.xml`).
+6. Drop any `xunit.v3.mtp-v1` reference — MTP v1 is gone at 4.x.
+7. Note any Mono-hosted run: official support is discontinued.
+8. Run the suite. Analyzers 2.0.0 diagnostics surface as warnings, which the house `TreatWarningsAsErrors` turns into build failures — triage them as part of the migration, not afterwards.
+
+## Common stale v2 / 3.x-isms
+
+| Wrong | Right (v4) | From |
+|---|---|---|
+| `<PackageReference Include="xunit" Version="2.x" />` | `xunit.v3` | v2 |
+| `Microsoft.NET.Test.Sdk` + `xunit.runner.visualstudio` | `xunit.v3` alone + the `global.json` runner entry | v2 |
+| Missing `<OutputType>Exe</OutputType>` or a hand-written `Program.Main` | Exe output; `Main` is generated | v2 |
+| `using Xunit.Abstractions;` | `using Xunit;` | v2 |
+| `Task IAsyncLifetime.InitializeAsync()` | `ValueTask` | v2 |
+| `coverlet.collector` | `Microsoft.Testing.Extensions.CodeCoverage` | 3.x |
+| `[assembly: CollectionBehavior(DisableTestParallelization = true)]` | `[assembly: Parallelization(Mode = ParallelMode.None)]` | 3.x |
+| `[assembly: CollectionBehavior(MaxParallelThreads = n)]` | `[assembly: Parallelization(MaxThreads = n)]` | 3.x |
+| `--report-junit` / `--report-ctrf` | `--report-xunit-junit` / `--report-xunit-ctrf` | 3.x |
+| CI glob `**/*.junit` | `**/*.junit.xml` | 3.x |
+| `xunit.v3.mtp-v1` | removed at 4.x — plain `xunit.v3` (MTP v2) | 3.x |
 
 ## Common mistakes
 
@@ -111,14 +194,15 @@ Not v2 habits — house-convention slips that a fresh v3 project still walks int
 |---|---|
 | A bare `Tests` suffix on the project name | `<ProjectUnderTest>.UnitTests`, leaving room for a sibling `<ProjectUnderTest>.IntegrationTests` |
 | A `net10.0`-only test project for a multi-targeted library | Mirror the library's TFMs — `net8.0;net10.0` — or its `net8.0` surface ships untested |
-| `Version="3.2.2"` on the `PackageReference` under CPM | The version lives once in `Directory.Packages.props`; the reference carries none |
+| `Version="4.0.0"` on the `PackageReference` under CPM | The version lives once in `Directory.Packages.props`; the reference carries none |
 | `LangVersion` / `Nullable` / `ImplicitUsings` / `TreatWarningsAsErrors` in the test csproj | They come from the solution-root `Directory.Build.props` |
-| Treating `coverlet.collector` as VSTest boilerplate and stripping it | It works under MTP — it is `Microsoft.NET.Test.Sdk` that conflicts |
+| Keeping `coverlet.collector` in a 4.0 project | It collects nothing under MTP v2 — it is a VSTest data collector; use `Microsoft.Testing.Extensions.CodeCoverage` |
+| A CI artifact glob still matching `.junit` | `.junit.xml` since 4.0 — the old glob matches nothing and the build stays green |
 
 ## Cross-references
 
 - **dotnet-solution-setup** — bundles the full test project as `templates/test.csproj` (fixture copy-glob included) and places it at step 10 of its **New solution bootstrap** checklist.
-- **dotnet-solution-config** — owns `Directory.Packages.props` (its Tests group carries `xunit.v3` + `coverlet.collector`, and no `Microsoft.NET.Test.Sdk`), `Directory.Build.props` (the four properties this skill's example deliberately omits), and `global.json` (SDK pin + the `test.runner` entry above).
+- **dotnet-solution-config** — owns `Directory.Packages.props` (its Tests group carries `xunit.v3` + `Microsoft.Testing.Extensions.CodeCoverage`, and no `Microsoft.NET.Test.Sdk`), `Directory.Build.props` (the four properties this skill's example deliberately omits), and `global.json` (SDK pin + the `test.runner` entry above).
 - **dotnet-async** — async test bodies, `ValueTask` lifecycle, and cancellation-token plumbing.
 
-If an existing solution is on xUnit v2 or VSTest mode, stay consistent within it and flag the divergence — migrating is its own work item, not a drive-by.
+If an existing solution is on xUnit v2, VSTest mode, or `xunit.v3` 3.x, stay consistent within it and flag the divergence — migrating is its own work item, not a drive-by (see the migration checklist above).

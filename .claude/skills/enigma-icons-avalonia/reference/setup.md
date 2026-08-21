@@ -127,7 +127,7 @@ platform render interface, and a test method missing `[AvaloniaFact]` fails with
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="xunit.v3" Version="3.2.2" />
+  <PackageReference Include="xunit.v3" Version="4.0.0" />
   <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.0" />
 </ItemGroup>
 ```

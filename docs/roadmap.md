@@ -31,6 +31,6 @@ The single, persistent registry of every work item in this project. Summary only
 | - PHASE03    | release mechanics + item shapes    | DONE        | (in FEATURE-6D97.md)      |
 | FEATURE-6B78 | Question free-text escape option   | DONE        | docs/plan/FEATURE-6B78.md |
 | FEATURE-2059 | Aligned, auto-reformatted roadmap  | DONE        | docs/plan/FEATURE-2059.md |
-| FEATURE-15CB | xUnit 4.0 skill update             | TODO        | docs/plan/FEATURE-15CB.md |
-| - PHASE01    | `xunit-v3` skill rewrite for 4.0   | TODO        | (in FEATURE-15CB.md)      |
-| - PHASE02    | Propagate 4.0 to sibling skills    | TODO        | (in FEATURE-15CB.md)      |
+| FEATURE-15CB | xUnit 4.0 skill update             | DONE        | docs/plan/FEATURE-15CB.md |
+| - PHASE01    | `xunit-v3` skill rewrite for 4.0   | DONE        | (in FEATURE-15CB.md)      |
+| - PHASE02    | Propagate 4.0 to sibling skills    | DONE        | (in FEATURE-15CB.md)      |
