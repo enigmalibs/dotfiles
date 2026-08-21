@@ -45,11 +45,11 @@
   </ItemGroup>
   -->
 
-  <!-- Tests (MTP-native: xunit.v3 only; coverlet.collector for coverage). No Microsoft.NET.Test.Sdk. -->
+  <!-- Tests (MTP-native: xunit.v3 only; Microsoft.Testing.Extensions.CodeCoverage for coverage). No Microsoft.NET.Test.Sdk. -->
   <!--
   <ItemGroup>
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.10.0" />
   </ItemGroup>
   -->
 

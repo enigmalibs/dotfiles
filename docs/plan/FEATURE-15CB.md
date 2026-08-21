@@ -1,6 +1,6 @@
 # FEATURE-15CB — xUnit 4.0: update `xunit-v3` and propagate across the skill set
 
-**Status:** IN PROGRESS
+**Status:** DONE
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-15cb-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -316,7 +316,7 @@ Replace `## Common stale v2-isms` with `## Common stale v2 / 3.x-isms`, a single
 
 ## PHASE02 — Propagate the 4.0 facts to sibling skills
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** no file under `.claude/skills/**` contradicts PHASE01's skill. Mechanical application of
 decisions already made — no new decisions in this phase.

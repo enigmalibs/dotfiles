@@ -58,7 +58,7 @@ Given the version `X.Y.Z` being released, take **one** of two paths — which on
    | `BouncyCastle.Cryptography` (MIT) | runtime, all TFMs | **yes** — audit it |
    | `System.Buffers` (MIT) | runtime, `netstandard2.0` only | **yes** — audit it |
    | `PolySharp` (MIT) | compile-only, `PrivateAssets=all` | no — not redistributed |
-   | `xunit.v3`, `coverlet.collector` | test-only | no — never in the package |
+   | `xunit.v3`, `Microsoft.Testing.Extensions.CodeCoverage` | test-only | no — never in the package |
 
    (Enigma.Core's actual audit, as the worked example.) **Record the findings in the completion doc.** This step is **first release only** — it is not repeated on routine bumps.
 3. **Author the release documents** from the templates — `README.md`, `RELEASENOTES.md` (first-release variant), the per-category guides and their index, and `SECURITY.md`. See *Release documents*.

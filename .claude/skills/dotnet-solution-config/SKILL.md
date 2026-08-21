@@ -65,7 +65,7 @@ This is the single source of truth for these values — they do **not** belong i
 
 The template ships commented example groups (Core / CLI / Desktop / Tests); uncomment and fill only the ones the solution needs.
 
-The **Tests** group is MTP-native: `xunit.v3` plus, optionally, `coverlet.collector` for coverage — and **no `Microsoft.NET.Test.Sdk`**, which is VSTest-era boilerplate that breaks the Microsoft Testing Platform (see xunit-v3). The **Core** group's `System.Buffers` / `PolySharp` entries exist to back the *conditional* `netstandard2.0`-only `PackageReference`s in `dotnet-solution-setup/templates/library.csproj`; drop them for a library that doesn't multi-target `netstandard2.0`.
+The **Tests** group is MTP-native: `xunit.v3` plus, optionally, `Microsoft.Testing.Extensions.CodeCoverage` for coverage — and **no `Microsoft.NET.Test.Sdk`**, which is VSTest-era boilerplate that breaks the Microsoft Testing Platform (see xunit-v3). The **Core** group's `System.Buffers` / `PolySharp` entries exist to back the *conditional* `netstandard2.0`-only `PackageReference`s in `dotnet-solution-setup/templates/library.csproj`; drop them for a library that doesn't multi-target `netstandard2.0`.
 
 ## global.json
 
@@ -81,13 +81,13 @@ The **Tests** group is MTP-native: `xunit.v3` plus, optionally, `coverlet.collec
 - **`sdk`** — pins the SDK so every machine and CI agent builds with the same toolchain. `rollForward: latestFeature` accepts a newer feature band of the same major version rather than failing on an exact-version mismatch.
 - **`test`** — opts `dotnet test` into the **Microsoft Testing Platform** (MTP) instead of VSTest. Required for an xUnit v3 test project; **xunit-v3** owns the runner entry and the project side of it.
 
-**Invocation note (.NET 10 SDK, MTP mode):** `dotnet test <Solution>.slnx` is **rejected** — a solution must be passed through the explicit flag:
+**Invocation note (.NET 10 SDK, MTP mode):** pass a solution through the explicit flag:
 
 ```
 dotnet test --solution <Solution>.slnx
 ```
 
-Use that form in scripts, docs, and CI; plain `dotnet test` inside a project directory still works.
+Use that form in scripts, docs, and CI — it is the portable, always-correct one. On SDK 10.0.300 the bare positional `dotnet test <Solution>.slnx` is *also* accepted (it was rejected on earlier 10.0 SDKs), so treat `--solution` as the reliable form rather than the only working one. Plain `dotnet test` inside a project directory still works.
 
 ## Cross-references
 
@@ -112,8 +112,9 @@ Use that form in scripts, docs, and CI; plain `dotnet test` inside a project dir
 | Repeating `LangVersion` / `Nullable` / `ImplicitUsings` / `TreatWarningsAsErrors` in every csproj | Put them once in `Directory.Build.props`. |
 | Adding `Version="..."` to a project `<PackageReference>` under CPM | The version lives centrally in `<PackageVersion>`; the reference carries none. |
 | Bumping Avalonia / Carbon / Phosphor versions individually | Bump the coupled ecosystem together. |
-| `Microsoft.NET.Test.Sdk` in the CPM Tests group | VSTest-era boilerplate that breaks MTP — `xunit.v3` (+ optional `coverlet.collector`) only. |
+| `Microsoft.NET.Test.Sdk` in the CPM Tests group | VSTest-era boilerplate that breaks MTP — `xunit.v3` (+ optional `Microsoft.Testing.Extensions.CodeCoverage`) only. |
+| `coverlet.collector` in the CPM Tests group | A VSTest data collector — MTP v2 (xunit.v3 4.0) does not host it, so coverage silently collects nothing while the build stays green. Use `Microsoft.Testing.Extensions.CodeCoverage`. |
 | `global.json` with only the `sdk` pin, for a solution with xUnit v3 tests | Add `"test": { "runner": "Microsoft.Testing.Platform" }` too, or `dotnet test` falls back to VSTest. |
-| `dotnet test <Solution>.slnx` on the .NET 10 SDK in MTP mode | Rejected — pass the solution as `dotnet test --solution <Solution>.slnx`. |
+| Assuming the positional `dotnet test <Solution>.slnx` form is portable | Pass the solution as `dotnet test --solution <Solution>.slnx` — the always-correct form. The positional form is accepted on SDK 10.0.300 but was rejected on earlier 10.0 SDKs. |
 
 If an existing solution already has its own root config, stay consistent with it and flag the divergence rather than silently mixing styles.
