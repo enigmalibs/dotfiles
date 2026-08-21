@@ -1,6 +1,6 @@
 # FEATURE-15CB — xUnit 4.0: update `xunit-v3` and propagate across the skill set
 
-**Status:** TODO
+**Status:** IN PROGRESS
 **Type:** FEATURE (multi-phase)
 **Branch (per phase, at build time):** `feature/feature-15cb-phaseNN-<slug>` — one branch per phase, cut from current `HEAD`.
 
@@ -90,7 +90,7 @@ deliberate.
 
 ## PHASE01 — `xunit-v3` skill rewritten for 4.0
 
-**Status:** TODO
+**Status:** DONE
 
 **Goal:** `.claude/skills/xunit-v3/SKILL.md` becomes the single authority for xUnit 4.0 house conventions,
 with the coverage setup verified against a real SDK 10 run rather than inferred from docs.
