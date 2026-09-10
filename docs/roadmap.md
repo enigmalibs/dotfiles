@@ -36,4 +36,4 @@ The single, persistent registry of every work item in this project. Summary only
 | - PHASE02    | Propagate 4.0 to sibling skills         | DONE        | (in FEATURE-15CB.md)      |
 | FEATURE-608E | `/vibe` autonomous coding workflow      | DONE        | docs/plan/FEATURE-608E.md |
 | FEATURE-3BF6 | `/interview`: skip plan confirmation    | DONE        | docs/plan/FEATURE-3BF6.md |
-| FEATURE-75F7 | `/bulk` builds planned items unattended | TODO        | docs/plan/FEATURE-75F7.md |
+| FEATURE-75F7 | `/bulk` builds planned items unattended | DONE        | docs/plan/FEATURE-75F7.md |

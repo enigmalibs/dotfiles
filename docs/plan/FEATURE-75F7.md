@@ -1,6 +1,6 @@
 # FEATURE-75F7 — `/bulk`: build already-planned items unattended
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (single-phase)
 **Branch (at build time):** `feature/feature-75f7-bulk-command`, cut from current `HEAD`.
 
