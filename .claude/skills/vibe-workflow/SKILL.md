@@ -1,13 +1,13 @@
 ---
 name: vibe-workflow
-description: Use when running the autonomous /vibe workflow — the override layer on top of dev-workflow that lets a run decide instead of ask, commit and merge its own devs on a vibe/<date>-<slug> run branch, bound fix attempts, quarantine red devs, resume after a session dies, and forbid pushes, sub-agents, and any write to the starting branch. Loaded by /vibe only — never by /interview or /build.
+description: Use when running the autonomous /vibe workflow — the override layer on top of dev-workflow that lets a run decide instead of ask, commit and merge its own devs on a vibe/<date>-<slug> run branch, bound fix attempts, quarantine red devs, resume after a session dies, and forbid pushes, sub-agents, and any write to the starting branch. Loaded by the autonomous run commands /vibe and /bulk only — never by /interview or /build.
 ---
 
 # Vibe workflow — autonomy overrides on top of dev-workflow
 
-**Version: vibe-workflow v1.**
+**Version: vibe-workflow v2.**
 
-Load the `dev-workflow` skill first. Everything it defines applies unless a section below supersedes it; **where the two disagree, this skill wins.** This skill is an override layer, not a copy: it never restates what it inherits, and it never edits `dev-workflow`. It is loaded by `/vibe` only — `/interview` and `/build` never load it.
+Load the `dev-workflow` skill first. Everything it defines applies unless a section below supersedes it; **where the two disagree, this skill wins.** This skill is an override layer, not a copy: it never restates what it inherits, and it never edits `dev-workflow`. It is loaded by the two **run commands** — `/vibe` (plans and builds from a spec) and `/bulk` (builds already-planned items) — and never by `/interview` or `/build`. Below, **the run command** means whichever of the two is running, and `<command>` its name (`vibe` or `bulk`).
 
 ## §1 — Relationship to `dev-workflow`
 
@@ -37,8 +37,8 @@ Supersedes *Asking questions (both flows)*.
 
 Supersedes the branching rules of *Version Control* and of *Two flows*.
 
-- **Run branch:** `vibe/<yyyy-mm-dd>-<slug>` — date from `date +%Y-%m-%d`, slug ≤ 4 kebab-case words derived from the prompt — cut from the current `HEAD`. Detached `HEAD` is fine; the default branch is never switched to.
-- **Planning artifacts live on the run branch**, not on the starting `HEAD`: the run's **first commit is the planning commit** (`docs(roadmap): plan <ID>[, <ID>…]`, the inherited planning-commit format), carrying the roadmap rows, the plan files, and the `docs/` structure when it had to be created.
+- **Run branch:** `<command>/<yyyy-mm-dd>-<slug>` — `vibe/…` or `bulk/…`; date from `date +%Y-%m-%d`; slug ≤ 4 kebab-case tokens — for `/vibe` derived from the prompt, for `/bulk` the lowercased selected base IDs joined with `-` when ≤ 3 items, else `<first-id>-plus-<N>` — cut from the current `HEAD`. Detached `HEAD` is fine; the default branch is never switched to.
+- **The run's first commit claims its items.** For `/vibe` it is the **planning commit** (`docs(roadmap): plan <ID>[, <ID>…]`, the inherited planning-commit format) carrying the roadmap rows, the plan files, and the `docs/` structure when it had to be created — planning artifacts live on the run branch, not on the starting `HEAD`. For `/bulk`, whose items were already planned and committed by the user, it is the **claim commit** `docs(plan): claim <ID>[, <ID>…] for <run branch>`, which only adds the `**Run:**` marker (§9) to each selected plan file — statuses and the roadmap are untouched.
 - **Each dev branch** is named per `dev-workflow` (`feature/feature-3a7f-phase01-<slug>`, `bugfix/bug-9c2e-<slug>`, `review/code-review-7f10-<slug>`) and is **cut from the run-branch tip** — never from another dev branch. Its first change flips the item/phase to `IN PROGRESS` (inherited). When the dev is done and committed: `git switch <run branch>`, then `git merge --no-ff <dev branch>` (git's default merge message). The next dev branch is cut from the new tip.
 - **The starting branch/commit and the repository's default branch are never written to** — not checked out for editing, not committed to, not merged into. Everything a run produces is reachable from the run branch, or from an unmerged (quarantined) dev branch.
 
@@ -63,11 +63,13 @@ Supersedes the branching rules of *Version Control* and of *Two flows*.
          vibe/2026-09-10-user-auth
 ```
 
+A `/bulk` run has the same shape, with `bulk/…` as the run branch and `docs(plan): claim …` as its first commit.
+
 ## §4 — Commits are yours
 
 Supersedes "never commit changes yourself" and "between devs, pause".
 
-- The run commits **after planning** (`docs(roadmap): …`), **after every dev** (one commit per dev, inherited message format — `feat(FEATURE-3A7F): add login flow (PHASE01)`, `fix(BUG-9C2E): …`, `fix(CODE-REVIEW-7F10): …`; the scope is always the base ID), and **when quarantining** (§6).
+- The run commits **after planning or claiming** (`docs(roadmap): plan …` for `/vibe`, `docs(plan): claim …` for `/bulk`), **after every dev** (one commit per dev, inherited message format — `feat(FEATURE-3A7F): add login flow (PHASE01)`, `fix(BUG-9C2E): …`, `fix(CODE-REVIEW-7F10): …`; the scope is always the base ID), and **when quarantining** (§6).
 - Append the session's `Co-Authored-By` trailer when the session provides one, so a run's commits are distinguishable from the user's.
 - **Staging discipline:** read `git status --porcelain`, then stage the dev's files explicitly with `git add <paths>`. Never `git add -A` or `git add .`; never stage build outputs, IDE files, or anything unrelated to the dev. An un-ignored `bin/`/`obj/` is a follow-up line in the completion doc, not a commit.
 - **Never pause between devs.** Print the multi-phase progress table (when applicable) and the commit title/description, then cut the next dev branch and continue.
@@ -95,7 +97,7 @@ Extends *Definition of Done* (criteria 1–5 inherited unchanged).
   2. Commit on the dev branch with the normal message format plus the title suffix ` — QUARANTINED`.
   3. `git switch <run branch>` — **without merging**.
   4. Set the roadmap row to `IN PROGRESS` (whole-table reformat, inherited) and add the footnote beneath the table:
-     `` > `<full ID>` quarantined by `/vibe` run `<run branch>` — <reason>; branch `<dev branch>` unmerged. Finish with `/build <base ID>`. ``
+     `` > `<full ID>` quarantined by `/<command>` run `<run branch>` — <reason>; branch `<dev branch>` unmerged. Finish with `/build <base ID>`. ``
   5. Commit `docs(roadmap): quarantine <full ID>`.
   6. Skip every remaining phase of that item (they stay `TODO`), and continue with the next run item.
 - **A quarantined dev gets no `docs/done/` file** — it is not done. Its failure state lives in the plan file and in the roadmap footnote.
@@ -117,32 +119,42 @@ Supersedes *Sub-Agent Delegation* entirely.
 
 A run must survive context summarization and session death, so **files are the source of truth between devs**: before each dev, re-read `docs/roadmap.md` and the target plan file from disk instead of relying on conversation memory.
 
-Every plan file a run writes carries, directly under its `**Branch:**` line:
+Every plan file a run **owns** carries, directly after its header block (the consecutive `**Status:**` / `**Type:**` / `**Branch…:**` lines at the top, before the first blank line):
 
 ```markdown
 **Run:** vibe/2026-09-10-user-auth
 ```
 
-**The run's items are exactly the plan files carrying its `**Run:**` marker** — never items recalled from the conversation, and never pre-existing `TODO`/`IN PROGRESS` rows planned by `/interview`, which are left for `/build`. Resume logic belongs to `/vibe`; this skill only fixes the marker format.
+`/vibe` writes the line when it creates the plan file; `/bulk` adds it to the selected, already-existing plan files in its claim commit.
+
+**The run's items are exactly the plan files carrying its `**Run:**` marker** — never items recalled from the conversation, never plan files carrying **another** run's marker, and — for `/vibe` — never pre-existing rows planned by `/interview`, which are left for `/build` or `/bulk`. Resume logic belongs to the run command; this skill only fixes the marker format.
 
 ## §10 — Pre-flight stops
 
-Nothing is written before pre-flight passes. Each stop prints the shape *"vibe: cannot start — `<reason>`. `<what the user should do>`."* and ends the turn:
+Nothing is written before pre-flight passes. Each stop prints the shape *`<command>: cannot start — <reason>. <what the user should do>.`* (the run command's name as the prefix) and ends the turn:
 
-| Condition                         | Message                                                                                     |
-|-----------------------------------|---------------------------------------------------------------------------------------------|
-| no git repository                 | vibe: cannot start — no git repository here. Run `git init` and commit a baseline first.      |
-| plan mode active                  | vibe: cannot start — plan mode is active. Switch to a permission mode that does not prompt, then re-run. |
-| dirty working tree                | vibe: cannot start — the working tree has uncommitted changes. Commit or stash them yourself, then re-run. |
-| run-branch name collision         | vibe: cannot start — branch `<run branch>` already exists. Re-run with different wording, or resume it with `/vibe` (no argument) from that branch. |
-| no argument, nothing resumable    | vibe: nothing to resume here — pass a spec to start a run.                                    |
+| Condition                                | Message                                                                                                                                                                      |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| no git repository                        | <command>: cannot start — no git repository here. Run `git init` and commit a baseline first.                                                                                |
+| plan mode active                         | <command>: cannot start — plan mode is active. Switch to a permission mode that does not prompt, then re-run.                                                                |
+| dirty working tree                       | <command>: cannot start — the working tree has uncommitted changes. Commit or stash them yourself, then re-run.                                                              |
+| run-branch name collision                | <command>: cannot start — branch `<run branch>` already exists. Re-run with different wording, or resume it with `/<command>` (no argument) from that branch.                |
+| no argument, nothing resumable (`/vibe`) | vibe: nothing to resume here — pass a spec to start a run.                                                                                                                   |
+| no roadmap (`/bulk`)                     | bulk: nothing to build — no `docs/roadmap.md` here. Plan items with `/interview` first.                                                                                      |
+| unknown ID (`/bulk`)                     | bulk: cannot start — `<ID>` is not in `docs/roadmap.md`. Check the ID, or plan it with `/interview` first.                                                                   |
+| phase ID passed (`/bulk`)                | bulk: cannot start — `<phase ID>` is a phase. Pass the base ID `<base ID>` (its `TODO` phases build in order), or use `/build <phase ID>` for a single phase.                |
+| ID not `TODO` (`/bulk`)                  | bulk: cannot start — `<ID>` is `<status>`. Only `TODO` rows are built; an `IN PROGRESS` row belongs to `/build`, a quarantine, or another run.                               |
+| ID owned by another run (`/bulk`)        | bulk: cannot start — `<ID>` already carries `**Run:** <branch>`. Resume that run from its branch, or finish the item with `/build <ID>`.                                     |
+| plan file missing (`/bulk`)              | bulk: cannot start — `docs/plan/<ID>.md` does not exist. Plan the item with `/interview` first.                                                                              |
+| nothing selectable (`/bulk`)             | bulk: nothing to build — no unowned `TODO` row in `docs/roadmap.md`. Plan items with `/interview` first.                                                                     |
+| no argument, nothing resumable (`/bulk`) | *(not a stop — no argument outside a `bulk/*` run starts a new run over every unowned `TODO` row; listed here so the two commands' no-argument semantics sit side by side.)* |
 
 ## §11 — End-of-run report
 
 The run ends on the run branch and prints this report (tables padded per the inherited formatting rule):
 
 ```
-vibe run vibe/2026-09-10-user-auth — 3 devs done, 1 quarantined
+<command> run <run branch> — 3 devs done, 1 quarantined
 Started from: master @ edb28ad
 
 | Dev                  | Branch                             | Status      | Commit  |
@@ -161,24 +173,27 @@ Merge:    git switch master && git merge --no-ff vibe/2026-09-10-user-auth
 Clean up: git branch -d feature/feature-3a7f-phase01-login bugfix/bug-9c2e-token-refresh
 ```
 
+A `/bulk` report has the same shape and, in no-argument mode, one extra `Skipped:` line after `Quarantined:` naming the rows it did not select and why (`IN PROGRESS`, owned by another run) — omitted when nothing was skipped.
+
 The run never runs the *Review* / *Finish* / *Merge* / *Clean up* commands itself — they are the user's, and `push` stays forbidden (§5).
 
 ## §12 — Common mistakes
 
-| Mistake                                                     | Fix                                                                       |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------|
-| Asking "shall I continue?", or any confirmation round         | Decide with the option you would have recommended, and keep going (§2)        |
-| Committing on the branch the user started from                | Everything lands on the run branch or on a dev branch (§3)                    |
-| Cutting a dev branch from the previous dev branch             | `git switch <run branch>` first, then branch from its tip (§3)                |
-| Leaving a dev uncommitted "for the user to review"            | The run commits every dev itself and never pauses (§4)                        |
-| Merging a red dev, or marking it `DONE`                       | Quarantine it, leave the branch unmerged, footnote the roadmap (§6)           |
-| A 4th fix cycle, or "one more quick try"                      | The budget is 3 cycles, then quarantine (§6)                                  |
-| `git add -A` sweeping `bin/`, `obj/`, `.idea/`                | Stage explicit paths after reading `git status --porcelain` (§4)              |
-| Writing `docs/done/<ID>.md` for a quarantined dev             | Quarantined is not done — the plan file and the footnote carry the state (§6) |
+| Mistake                                                                           | Fix                                                                           |
+|-----------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Asking "shall I continue?", or any confirmation round                             | Decide with the option you would have recommended, and keep going (§2)        |
+| Committing on the branch the user started from                                    | Everything lands on the run branch or on a dev branch (§3)                    |
+| Cutting a dev branch from the previous dev branch                                 | `git switch <run branch>` first, then branch from its tip (§3)                |
+| Leaving a dev uncommitted "for the user to review"                                | The run commits every dev itself and never pauses (§4)                        |
+| Merging a red dev, or marking it `DONE`                                           | Quarantine it, leave the branch unmerged, footnote the roadmap (§6)           |
+| A 4th fix cycle, or "one more quick try"                                          | The budget is 3 cycles, then quarantine (§6)                                  |
+| `git add -A` sweeping `bin/`, `obj/`, `.idea/`                                    | Stage explicit paths after reading `git status --porcelain` (§4)              |
+| Writing `docs/done/<ID>.md` for a quarantined dev                                 | Quarantined is not done — the plan file and the footnote carry the state (§6) |
+| `/bulk` picking up an `IN PROGRESS` row, or a plan file with another run's marker | Only unowned `TODO` rows are selectable (§9, §10)                             |
 
 ## §13 — Cross-references
 
 - **dev-workflow** — everything inherited: roadmap and plan-file shapes, work-item IDs, branch naming, the Definition of Done, completion docs, the multi-phase progress table, the CRLF policy, and the commit-message formats.
-- **Stack and convention skills** (the dotnet / avalonia / xunit family, `git-repo-hygiene`, …) — loaded by the run's self-interview exactly as `/interview` loads them; their defaults are authoritative, applied and recorded rather than questioned.
+- **Stack and convention skills** (the dotnet / avalonia / xunit family, `git-repo-hygiene`, …) — loaded by `/vibe`'s self-interview exactly as `/interview` loads them, and by `/bulk` for the codebase it builds in; their defaults are authoritative, applied and recorded rather than questioned.
 
 If the target project already enforces its own conventions (roadmap, work-item IDs, branch naming, documentation layout), those take precedence — apply them and record the choice.

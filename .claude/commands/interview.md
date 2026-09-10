@@ -1,5 +1,5 @@
 ---
-description: Requirements interview on a spec draft (feature, bug, or code review) — phased AskUserQuestion rounds with recommended options, a validated requirements summary, then plans-only (roadmap + plan files) to build later with /build. Never implements.
+description: Requirements interview on a spec draft (feature, bug, or code review) — phased AskUserQuestion rounds with recommended options, a consolidated requirements summary printed for the record, then plans-only (roadmap + plan files) written in the same turn — no confirmation round — to build later with /build or /bulk. Never implements.
 argument-hint: <spec draft text>
 disable-model-invocation: true
 ---
@@ -18,7 +18,7 @@ Conduct a thorough requirements-gathering interview to extract all information n
 ## Phase 0: Announce the version
 **Before anything else** — before reading the draft, analysing, or asking any question — your very first output must be exactly this line, as plain text, on its own line and with nothing before it:
 
-Using interview v9 by Josué Clément
+Using interview v10 by Josué Clément
 
 Then proceed to Phase 1.
 
@@ -54,21 +54,21 @@ Then proceed to Phase 1.
 - **Delegation is an answer.** At any point I may reply "you decide" (for one question), "go with your recommendations" (for the whole round), or "finish with your recommendations" (for everything remaining). Adopt the recommended option(s), stop asking about those topics, and record each one in the Phase 3 summary as a *recommendation accepted by delegation*.
 - **Mandatory final round.** The last round of Phase 2 is always one single AskUserQuestion: *"Did you forget to mention something in your specs — or is there any constraint, context, or preference I haven't asked about?"* with the options "No — nothing to add" and "Yes — I'll describe it". Move to Phase 3 only after a "No".
 
-## Phase 3: Validation
+## Phase 3: Consolidated summary
 Once you believe you have enough information:
 1. Provide a **detailed summary of the consolidated requirements** covering: objective; context (new project or evolution); existing codebase constraints if applicable; complete functional requirements; technical stack and constraints; architecture and design patterns to follow; integration points and impacted areas; public interfaces / API contracts (if applicable); backward compatibility and migration requirements (if applicable); error handling strategy; testing requirements (unit, integration, coverage targets); documentation requirements; code quality standards; expected file/module structure; acceptance criteria; and the **proposed work-item breakdown** — ID(s), title, single- vs multi-phase split with phase titles, and suggested branch name(s) (per the `dev-workflow` skill; a code review is a `CODE-REVIEW-HHHH` item whose findings are the phases, ordered by severity).
 2. **Structure the summary by provenance** so every point's origin is auditable: **Decisions you made** · **Recommendations you accepted** (including every "you decide" delegation) · **House conventions applied without asking** (from convention skills, if any) · **Assumptions & defaults I applied without asking** (low-impact only) · **Beyond-the-draft dimensions raised and how each was resolved** (one line each, including those judged not applicable).
-3. Wait for my confirmation before proceeding. If I give corrections: update the summary, re-present at least the changed sections, and wait for confirmation again — only a summary I have explicitly confirmed becomes the Phase 4 specification.
+3. **Do not wait for confirmation and do not ask whether to proceed** — the mandatory final round of Phase 2 was the last gate. The printed summary *is* the Phase 4 specification: continue straight into Phase 4 in the same turn. If I send corrections afterwards, apply them to the written plan files and roadmap rows, re-present the changed sections, and stop again.
 
 ## Phase 4: Delivery (planning only)
-Once I have confirmed the Phase 3 summary, **load and follow the `dev-workflow` skill** — it defines the roadmap, plan files, work-item IDs, branch naming, Definition of Done, version control, and sub-agent delegation standards shared across the workflow. For `/interview`, only the skill's **planning flow** applies (the Definition of Done and sub-agent delegation govern `/build`).
+Immediately after printing the Phase 3 summary, **load and follow the `dev-workflow` skill** — it defines the roadmap, plan files, work-item IDs, branch naming, Definition of Done, version control, and sub-agent delegation standards shared across the workflow. For `/interview`, only the skill's **planning flow** applies (the Definition of Done and sub-agent delegation govern `/build`).
 
 **`/interview` only plans — it never implements and never starts a dev.** There is no delivery-timing question. Run the skill's **planning flow**:
 
 - Write every planned work item's roadmap row and plan file (status `TODO`) on my **current branch/`HEAD`** — create **no** dev branch and change no code. For a `CODE-REVIEW-HHHH` item, the plan file lists the findings as severity-ordered phases (highest first), each with its severity and `file:line`.
-- Then print the single suggested **planning commit message** (a documentation commit for the batch, scoped `docs`/`chore` per the skill — not a `feat`/`fix` scope) and tell me I can run **`/build <ID>`** whenever I want to implement one. Stop there — do not offer to execute, and do not create a branch.
+- Then print the single suggested **planning commit message** (a documentation commit for the batch, scoped `docs`/`chore` per the skill — not a `feat`/`fix` scope) and tell me I can run **`/build <ID>`** to implement one item, or **`/bulk`** to build every planned `TODO` item unattended. Stop there — do not offer to execute, and do not create a branch.
 
-**Plan-mode note.** If the session is in plan mode, present the Phase 3 validated summary as the plan and obtain approval (ExitPlanMode) before writing anything — the plan files and roadmap rows all wait for that approval. In other permission modes, expect the plan-file and roadmap writes to raise permission prompts; treat them as harness mechanics, not as a reason to change approach. (No `git switch -c` happens here — branching belongs to `/build`.)
+**Plan-mode note.** If the session is in plan mode, present the Phase 3 summary as the plan and obtain approval (ExitPlanMode) before writing anything — this is the only approval step left, and it exists only in plan mode; the plan files and roadmap rows all wait for that approval. In other permission modes, expect the plan-file and roadmap writes to raise permission prompts; treat them as harness mechanics, not as a reason to change approach. (No `git switch -c` happens here — branching belongs to `/build`.)
 
 # Rules
 - **Never *silently* assume** — except where an applicable convention skill resolves the question: apply it and list it under "House conventions applied" in the Phase 3 summary. For every remaining open point, either ask, or — for low-impact details only — apply your recommended default and list it explicitly under "Assumptions & defaults I applied" in the Phase 3 summary. A "you decide" answer from me is an explicit decision, not an assumption.

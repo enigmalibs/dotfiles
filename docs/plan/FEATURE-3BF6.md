@@ -1,6 +1,6 @@
 # FEATURE-3BF6 — `/interview`: skip the plan confirmation
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (single-phase)
 **Branch (at build time):** `feature/feature-3bf6-interview-no-confirm`, cut from current `HEAD`.
 
