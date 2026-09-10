@@ -1,6 +1,6 @@
 # FEATURE-608E — `/vibe` autonomous coding workflow
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (single-phase)
 **Branch (at build time):** `feature/feature-608e-vibe-workflow`, cut from current `HEAD`.
 
