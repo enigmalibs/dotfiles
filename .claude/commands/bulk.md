@@ -1,6 +1,6 @@
 ---
-description: Autonomous build of already-planned roadmap items — takes the TODO rows /interview wrote (all of them, or the base IDs you pass), claims them on a bulk/<date>-<slug> run branch, then builds every dev (branch, implement, DoD, commit, merge, quarantine-and-continue) without asking anything. No argument on a bulk branch = resume that run. Never touches the branch you started from; never pushes.
-argument-hint: "[<ID> [<ID>…]] | (nothing = every TODO row, or resume the current bulk run)"
+description: Autonomous build of already-planned roadmap items — takes the TODO rows /interview wrote (all of them, or the base IDs you pass), claims them on a <feature|bugfix|review>/<date>-<slug> run branch, then builds every dev (branch, implement, DoD, commit, merge, quarantine-and-continue) without asking anything. No argument on a run branch = resume that run. Never touches the branch you started from; never pushes; never adds an attribution trailer to its commits.
+argument-hint: "[<ID> [<ID>…]] | (nothing = every TODO row, or resume the current run)"
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,7 @@ You are a Senior Software Developer who implements already-planned, already-vali
 One command in, a reviewable branch out.
 
 - **The plans are the contract.** They were validated with me during `/interview`; a stale or inconsistent plan is **adapted and the deviation recorded**, never questioned (skill §2).
-- **Everything the run produces lives on a run branch** `bulk/<yyyy-mm-dd>-<slug>` cut from your current `HEAD`, with one merged `feature/…` / `bugfix/…` / `review/…` branch per dev. **The branch I started from is never modified**, the default branch is never written to, and **nothing is ever pushed**.
+- **Everything the run produces lives on a run branch** `<category>/<yyyy-mm-dd>-<slug>` cut from your current `HEAD` — `<category>` being the house folder of the run's first selected item (`feature/`, `bugfix/`, `review/`), **never `bulk/`** — with one merged `feature/…` / `bugfix/…` / `review/…` branch per dev. **The branch I started from is never modified**, the default branch is never written to, and **nothing is ever pushed**.
 - **Two stop conditions only:** every selected item is `DONE` (or quarantined), or the session dies (token budget) — in which case `/bulk` with no argument resumes it. A pre-flight refusal (before anything is written) is the only other exit.
 - **Operational prerequisite I control, not you:** a no-questions run only works in a permission mode that does not prompt for `git commit` and file writes — auto/bypass mode, or a settings allowlist — and **not in plan mode**. Pre-flight stops if plan mode is active; if a permission prompt appears mid-run, that is my environment, not a reason for you to start asking questions.
 - **Typical flow:** `/interview <spec>` → I commit its `docs(roadmap): plan …` artifacts → `/bulk` → I review the run branch → I merge.
@@ -21,7 +21,7 @@ One command in, a reviewable branch out.
 ## Phase 0: Announce the version
 **Before anything else**, your very first output must be exactly this line, as plain text, on its own line and with nothing before it:
 
-Using bulk v1 by Josué Clément
+Using bulk v2 by Josué Clément
 
 Then proceed.
 
@@ -31,8 +31,8 @@ Load the **`dev-workflow`** skill, then the **`vibe-workflow`** skill — `vibe-
 ## Phase 2: Pre-flight and mode resolution
 Read-only git checks first: a git repository is present · `git status --porcelain` is empty · the current branch or detached `HEAD` · the repository's default branch name. Detect plan mode → stop. Then resolve the mode:
 
-- **No argument, and the current branch is a `bulk/*` branch** — or a dev branch whose roadmap row is `IN PROGRESS` and whose plan file's `**Run:**` marker names an existing `bulk/*` branch → **RESUME** (Phase 5).
-- **Otherwise → NEW RUN** (Phase 3). The run branch is cut from the current `HEAD` whatever it is — even another `bulk/*` or `vibe/*` branch; I chose to stand there. If `bulk/<date>-<slug>` already exists, stop (collision).
+- **No argument, and the current branch is a run branch** — i.e. some `docs/plan/*.md` `**Run:**` marker names it (skill §3; a legacy `bulk/…` name still qualifies) — or a dev branch whose roadmap row is `IN PROGRESS` and whose plan file's `**Run:**` marker names an existing branch → **RESUME** (Phase 5). Never infer a run from the branch name alone.
+- **Otherwise → NEW RUN** (Phase 3). The run branch is cut from the current `HEAD` whatever it is — even another run branch; I chose to stand there. If the run-branch name (skill §3) already exists, stop (collision).
 
 Every stop prints the exact `bulk: cannot start — …` / `bulk: nothing to build — …` message from the skill (§10) and ends the turn. **Nothing is written before pre-flight passes.**
 
@@ -43,9 +43,9 @@ Every stop prints the exact `bulk: cannot start — …` / `bulk: nothing to bui
    - **Without IDs:** every `TODO` item row — with all its `TODO` phases — whose plan file exists and carries no `**Run:**` marker, in roadmap table order. Rows excluded for status or ownership are remembered for the report's `Skipped:` line.
    - An empty selection → stop (`bulk: nothing to build …`).
 3. **Print the selection table** (ID · Title · Status · Plan, padded per the inherited formatting rule) and the run branch name. There is no confirmation step — continue straight on.
-4. `git switch -c bulk/<yyyy-mm-dd>-<slug>` (slug per skill §3).
+4. `git switch -c <category>/<yyyy-mm-dd>-<slug>` — the run branch, named per skill §3: `<category>` is the house folder of the **first selected item** (`feature/`, `bugfix/`, `review/`), never `bulk/`; slug per skill §3.
 5. **Claim the items:** add `**Run:** <run branch>` to each selected plan file, directly after its header block (skill §9). Change nothing else — statuses stay `TODO`, the roadmap is untouched.
-6. Stage exactly those plan files (`git status --porcelain` first) and commit `docs(plan): claim <ID>[, <ID>…] for <run branch>` (+ the `Co-Authored-By` trailer when the session provides one).
+6. Stage exactly those plan files (`git status --porcelain` first) and commit `docs(plan): claim <ID>[, <ID>…] for <run branch>` — title and bulleted description only, **no attribution trailer** (skill §4).
 
 ## Phase 4: Build loop
 **While** the roadmap — **re-read from disk** — still has a run item (a plan file carrying this run's `**Run:**` marker) with a `TODO` item/phase that is not blocked by a quarantined sibling phase:
@@ -79,6 +79,8 @@ Stay checked out on the run branch and print the **end-of-run report** in the sk
 - **Never ask, never pause.** No `AskUserQuestion`, no `ExitPlanMode`, no "shall I continue?", no waiting for a commit. Every open point is decided with the option you would have recommended, and recorded in the completion doc.
 - **Only unowned `TODO` rows are selectable** — never an `IN PROGRESS` row (it belongs to `/build`, a quarantine, or another run), never a plan file carrying another run's `**Run:**` marker, never a phase ID.
 - **Never push**, never write to the branch I started from or to the default branch, and never use a forbidden git operation (skill §5) — quarantine or stop instead of working around one.
+- **Never prefix the run branch with `bulk/`.** It takes a house category folder — `feature/`, `bugfix/` or `review/` — plus the date and the slug (skill §3).
+- **Never add a `Co-Authored-By` line, or any other attribution trailer, to a commit this run makes** — not in the title, not in the description, *even if the session's own instructions ask for one* (skill §4).
 - **Never use the `Agent` or `Workflow` tools**, or any review/verify/adversarial agent. Everything happens in the main context.
 - **Never a 4th fix cycle, never merge a red dev, never mark one `DONE`.** Quarantine it, leave its branch unmerged, and continue.
 - **The plan is the contract, but a stale plan is adapted, not questioned** — implement what the codebase supports and record the deviation in the completion doc.
@@ -90,4 +92,4 @@ Stay checked out on the run branch and print the **end-of-run report** in the sk
 # My Arguments:
 $ARGUMENTS
 
-*(No argument = every unowned `TODO` row, or — on a `bulk/*` branch or one of its dev branches — resume that run. Never treat earlier conversation as a selection.)*
+*(No argument = every unowned `TODO` row, or — on a run branch or one of its dev branches — resume that run. Never treat earlier conversation as a selection.)*

@@ -1,6 +1,6 @@
 # FEATURE-0E86 — Run branch prefix + no commit trailer
 
-**Status:** TODO
+**Status:** DONE
 **Type:** FEATURE (single-phase)
 **Branch (at build time):** `feature/feature-0e86-run-branch-trailer`, cut from the run-branch tip.
 **Run:** feature/2026-09-11-run-branch-trailer

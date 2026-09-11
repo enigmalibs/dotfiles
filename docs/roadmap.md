@@ -37,4 +37,4 @@ The single, persistent registry of every work item in this project. Summary only
 | FEATURE-608E | `/vibe` autonomous coding workflow      | DONE        | docs/plan/FEATURE-608E.md |
 | FEATURE-3BF6 | `/interview`: skip plan confirmation    | DONE        | docs/plan/FEATURE-3BF6.md |
 | FEATURE-75F7 | `/bulk` builds planned items unattended | DONE        | docs/plan/FEATURE-75F7.md |
-| FEATURE-0E86 | Run branch prefix + no commit trailer   | TODO        | docs/plan/FEATURE-0E86.md |
+| FEATURE-0E86 | Run branch prefix + no commit trailer   | DONE        | docs/plan/FEATURE-0E86.md |
