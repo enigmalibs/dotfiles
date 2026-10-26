@@ -1,0 +1,104 @@
+set incsearch
+set ignorecase
+set hlsearch
+set number
+set relativenumber
+set NERDTree
+
+let mapleader = " "
+
+nnoremap L $
+nnoremap H ^
+
+" file navigation
+nnoremap gh :action PreviousTab<CR>
+nnoremap gl :action NextTab<CR>
+nnoremap gj :action MethodDown<CR>
+nnoremap gk :action MethodUp<CR>
+nnoremap gn :action GotoNextElementUnderCaretUsage<CR>
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gs :action GotoSuperMethod<CR>
+
+nnoremap <leader>nh :nohlsearch<CR>
+
+" Search
+nnoremap <leader>sc :action GotoClass<CR><BS>
+nnoremap <leader>sf :action FindInPath<CR>
+nnoremap <leader>rf :action ReplaceInPath<CR>
+nnoremap <leader>sw :action Switcher<CR>
+nnoremap <leader>sr :action RecentFiles<CR>
+
+" Jump find
+nnoremap <leader>fw :action AceWordAction<CR>
+nnoremap <leader>fp :action AceTargetAction<CR>
+
+" Actions
+nnoremap <leader>re :action RenameElement<CR>
+nnoremap <leader>ge :action Generate<CR>
+nnoremap <leader>ac :action ShowIntentionActions<CR>
+nnoremap <leader>er :action ExpandAllRegions<CR>
+nnoremap <leader>cr :action CollapseAllRegions<CR>
+
+
+nnoremap <A-j> :action MoveLineDown<CR>
+nnoremap <A-k> :action MoveLineUp<CR>
+
+nnoremap <leader>zen :action ToggleZenMode<CR>
+
+" Windows
+nnoremap <leader>wh :action HideAllWindows<CR>
+nnoremap <leader>we :action ActivateProjectToolWindow<CR>
+nnoremap <leader>wl :action LocateInSolutionView<CR>
+
+" Split
+nnoremap <leader>tl :action MoveTabRight<CR>
+nnoremap <leader>tj :action MoveTabDown<CR>
+nnoremap <leader>tu :action Unsplit<CR>
+nnoremap <leader>ta :action UnsplitAll<CR>
+nnoremap <leader>tn :action NextSplitter<CR>
+nnoremap <leader>tp :action PrevSplitter<CR>
+
+" Close tabs
+nnoremap <leader>ca :action CloseAllEditors<CR>
+nnoremap <leader>co :action CloseAllEditorsButActive<CR>
+
+" Registers
+nnoremap <leader>yy "+y
+nnoremap <leader>y1 "1y
+nnoremap <leader>y2 "2y
+nnoremap <leader>y3 "3y
+nnoremap <leader>y4 "4y
+vnoremap <leader>yy "+y
+vnoremap <leader>y1 "1y
+vnoremap <leader>y2 "2y
+vnoremap <leader>y3 "3y
+vnoremap <leader>y4 "4y
+
+nnoremap <leader>pp "+p
+nnoremap <leader>p1 "1p
+nnoremap <leader>p2 "2p
+nnoremap <leader>p3 "3p
+nnoremap <leader>p4 "4p
+vnoremap <leader>pp "+p
+vnoremap <leader>p1 "1p
+vnoremap <leader>p2 "2p
+vnoremap <leader>p3 "3p
+vnoremap <leader>p4 "4p
+
+" Set bookmarks
+nnoremap <leader>m1 :action ToggleBookmark1<CR>
+nnoremap <leader>m2 :action ToggleBookmark2<CR>
+nnoremap <leader>m3 :action ToggleBookmark3<CR>
+nnoremap <leader>m4 :action ToggleBookmark4<CR>
+
+" Go to bookmarks
+nnoremap <leader>g1 :action GotoBookmark1<CR>
+nnoremap <leader>g2 :action GotoBookmark2<CR>
+nnoremap <leader>g3 :action GotoBookmark3<CR>
+nnoremap <leader>g4 :action GotoBookmark4<CR>
+
+" Toggle comment
+nnoremap <leader>kc :action CommentByLineComment<CR>
+vnoremap <leader>kc :action CommentByLineComment<CR>
+
